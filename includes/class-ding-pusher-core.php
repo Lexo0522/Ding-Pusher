@@ -376,6 +376,13 @@ class Ding_Pusher_Core {
         $webhook_url = $settings['webhook_url'];
         $message_type = $settings['message_type'];
         
+        // 处理换行符，确保在钉钉消息中正确显示
+        // 1. 替换转义的换行符 \n 为实际换行符
+        $content = str_replace( '\n', "\n", $content );
+        // 2. 确保直接输入的换行符能正确显示
+        $content = str_replace( "\r\n", "\n", $content );
+        $content = str_replace( "\r", "\n", $content );
+        
         // 构建消息数据
         $data = array(
             'msgtype' => $message_type

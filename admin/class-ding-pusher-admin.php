@@ -295,8 +295,8 @@ class Ding_Pusher_Admin {
         
         // 验证消息设置
         $valid['message_type'] = sanitize_text_field( $input['message_type'] );
-        $valid['post_template'] = sanitize_text_field( $input['post_template'] );
-        $valid['user_template'] = sanitize_text_field( $input['user_template'] );
+        $valid['post_template'] = sanitize_textarea_field( $input['post_template'] );
+        $valid['user_template'] = sanitize_textarea_field( $input['user_template'] );
         
         // 验证触发设置
         $valid['enable_new_post'] = isset( $input['enable_new_post'] ) ? 1 : 0;
