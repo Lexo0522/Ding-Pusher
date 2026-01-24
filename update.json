@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "download_url": "https://github.com/Lexo0522/Ding-Pusher/archive/refs/tags/v1.0.0.zip",
+  "homepage": "https://github.com/Lexo0522/Ding-Pusher",
+  "author": "Kate522",
+  "author_profile": "https://github.com/Lexo0522",
+  "requires": "5.8",
+  "tested": "6.6",
+  "requires_php": "7.4",
+  "description": "自动检测WordPress新文章并通过钉钉机器人推送，包含去重机制和新用户提示功能",
+  "installation": "1. 下载插件压缩包\n2. 登录WordPress后台，进入「插件」→「安装插件」→「上传插件」\n3. 选择下载的压缩包，点击「现在安装」\n4. 安装完成后，点击「激活插件」",
+  "changelog": "= 1.0.0 =\n* 初始版本发布\n* 实现新文章自动推送功能\n* 支持去重机制\n* 支持新用户提示\n* 支持WordPress原生自动更新\n* 支持多种消息类型",
+  "banners": {
+    "low": "https://raw.githubusercontent.com/Lexo0522/Ding-Pusher/master/assets/banner-772x250.jpg",
+    "high": "https://raw.githubusercontent.com/Lexo0522/Ding-Pusher/master/assets/banner-1544x500.jpg"
+  }
+}

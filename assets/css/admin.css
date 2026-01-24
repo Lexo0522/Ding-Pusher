@@ -1,0 +1,144 @@
+/* Ding Pusher Admin Styles */
+
+/* Keyword and IP list styles */
+.keyword-item,
+.ip-item {
+    margin-bottom: 10px;
+}
+
+.keyword-item input,
+.ip-item input {
+    margin-right: 10px;
+}
+
+/* Security type sections */
+#dtpwp-security-keyword,
+#dtpwp-security-secret,
+#dtpwp-security-ip-whitelist {
+    margin-top: 10px;
+}
+
+/* Button styles */
+.dtpwp-add-keyword,
+.dtpwp-add-ip {
+    margin-top: 10px;
+}
+
+/* Records page styles */
+#dtpwp-clear-records {
+    margin-bottom: 15px;
+}
+
+/* Sent message display styles */
+.dtpwp-sent-message {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-left: 4px solid #0073aa;
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 4px;
+}
+
+.dtpwp-sent-message strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #0073aa;
+}
+
+/* Notice styles */
+.dtpwp-notice {
+    padding: 12px;
+    margin: 15px 0;
+    border-left: 4px solid #00a32a;
+    background-color: #f0fff0;
+    color: #006400;
+}
+
+.dtpwp-notice-error {
+    border-left-color: #d63638;
+    background-color: #fff0f0;
+    color: #782b2c;
+}
+
+/* Tab styles */
+.dtpwp-tabs {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+}
+
+.dtpwp-tab {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 3px 3px 0 0;
+}
+
+.dtpwp-tab.active {
+    background-color: #fff;
+    font-weight: bold;
+}
+
+.dtpwp-tab-content {
+    display: none;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+.dtpwp-tab-content.active {
+    display: block;
+}
+
+/* Form styles */
+.dtpwp-form-table {
+    margin-top: 20px;
+}
+
+.dtpwp-form-table th {
+    width: 200px;
+    vertical-align: top;
+    padding-top: 10px;
+}
+
+.dtpwp-form-table td {
+    padding-top: 10px;
+}
+
+/* Action buttons */
+.dtpwp-actions {
+    margin-top: 20px;
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 782px) {
+    .dtpwp-form-table th {
+        width: 100%;
+        display: block;
+        padding-bottom: 5px;
+    }
+    
+    .dtpwp-form-table td {
+        display: block;
+        padding-top: 0;
+    }
+    
+    .keyword-item,
+    .ip-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .keyword-item input,
+    .ip-item input {
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+}
