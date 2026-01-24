@@ -75,7 +75,8 @@ class Ding_Pusher_Core {
             'retry_count' => 3,
             'retry_interval' => 10,
             'deduplicate_days' => 30,
-            'enable_test_message' => 1
+            'enable_test_message' => 1,
+            'enable_auto_update' => 1
         );
         
         add_option( DTPWP_OPTION_NAME, $default_settings );

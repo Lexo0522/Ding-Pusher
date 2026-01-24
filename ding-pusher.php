@@ -82,6 +82,12 @@ function dtpwp_plugin_updater( $transient ) {
         return $transient;
     }
     
+    // 检查是否启用自动更新
+    $settings = get_option( DTPWP_OPTION_NAME );
+    if ( ! isset( $settings['enable_auto_update'] ) || ! $settings['enable_auto_update'] ) {
+        return $transient;
+    }
+    
     // 检查更新的远程JSON文件URL
     $update_url = 'https://raw.githubusercontent.com/Lexo0522/Ding-Pusher/master/update.json';
     
@@ -179,8 +185,27 @@ add_filter( 'plugins_api', 'dtpwp_plugin_info', 20, 3 );
  * 处理插件更新包
  */
 function dtpwp_upgrader_source_selection( $source, $remote_source, $upgrader ) {
+    // 检查是否启用自动更新
+    $settings = get_option( DTPWP_OPTION_NAME );
+    if ( ! isset( $settings['enable_auto_update'] ) || ! $settings['enable_auto_update'] ) {
+        return $source;
+    }
+    
     $plugin_slug = dirname( plugin_basename( __FILE__ ) );
     $upgrader->skin->feedback( __( '正在更新 Ding Pusher 插件...', 'ding-pusher' ) );
     return $source;
 }
 add_filter( 'upgrader_source_selection', 'dtpwp_upgrader_source_selection', 10, 3 );
+
+/**
+ * 支持WordPress插件列表中的自动更新开关
+ */
+function dtpwp_auto_update_plugin( $update, $item ) {
+    // 只处理当前插件
+    if ( $item->slug === dirname( plugin_basename( __FILE__ ) ) ) {
+        $settings = get_option( DTPWP_OPTION_NAME );
+        return isset( $settings['enable_auto_update'] ) && $settings['enable_auto_update'];
+    }
+    return $update;
+}
+add_filter( 'auto_update_plugin', 'dtpwp_auto_update_plugin', 10, 2 );

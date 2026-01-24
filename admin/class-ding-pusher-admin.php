@@ -264,6 +264,14 @@ class Ding_Pusher_Admin {
             'ding-pusher',
             'dtpwp_advanced_section'
         );
+        
+        add_settings_field(
+            'enable_auto_update',
+            __( '启用插件自动更新', 'ding-pusher' ),
+            array( $this, 'render_enable_auto_update_field' ),
+            'ding-pusher',
+            'dtpwp_advanced_section'
+        );
     }
     
     /**
@@ -311,6 +319,8 @@ class Ding_Pusher_Admin {
         if ( $valid['deduplicate_days'] < 1 ) {
             $valid['deduplicate_days'] = 30;
         }
+        
+        $valid['enable_auto_update'] = isset( $input['enable_auto_update'] ) ? 1 : 0;
         
         // 更新定时任务
         wp_clear_scheduled_hook( 'dtpwp_check_new_content' );
@@ -543,6 +553,16 @@ class Ding_Pusher_Admin {
         $deduplicate_days = isset( $this->settings['deduplicate_days'] ) ? $this->settings['deduplicate_days'] : 30;
         echo '<input type="number" name="' . DTPWP_OPTION_NAME . '[deduplicate_days]" value="' . esc_attr( $deduplicate_days ) . '" min="1" max="365" class="small-text" />';
         echo '<p class="description">' . __( '设置去重记录的保留天数，过期记录将自动清理。', 'ding-pusher' ) . '</p>';
+    }
+    
+    /**
+     * 渲染启用自动更新字段
+     */
+    public function render_enable_auto_update_field() {
+        $enable_auto_update = isset( $this->settings['enable_auto_update'] ) ? $this->settings['enable_auto_update'] : 1;
+        echo '<input type="checkbox" name="' . DTPWP_OPTION_NAME . '[enable_auto_update]" value="1" ' . checked( 1, $enable_auto_update, false ) . ' />';
+        echo '<label for="' . DTPWP_OPTION_NAME . '[enable_auto_update]"> ' . __( '启用插件自动更新功能', 'ding-pusher' ) . '</label>';
+        echo '<p class="description">' . __( '启用后，插件将自动检测并提示更新，支持WordPress后台一键升级。', 'ding-pusher' ) . '</p>';
     }
     
     /**
