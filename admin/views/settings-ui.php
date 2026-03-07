@@ -119,10 +119,12 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                                     <div class="dtpwp-field">
                                         <label for="dtpwp-post-template">文章推送模板</label>
                                         <textarea id="dtpwp-post-template" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[post_template]" rows="4"><?php echo esc_textarea( $settings['post_template'] ); ?></textarea>
+                                        <p class="description">可用占位符：{title}、{author}、{link}、{excerpt}、{category}、{categories}、{date}、{publish_time}、{post_date}、{post_type}</p>
                                     </div>
                                     <div class="dtpwp-field">
                                         <label for="dtpwp-user-template">用户提示模板</label>
                                         <textarea id="dtpwp-user-template" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[user_template]" rows="4"><?php echo esc_textarea( $settings['user_template'] ); ?></textarea>
+                                        <p class="description">可用占位符：{username}、{email}、{register_time}</p>
                                     </div>
                                 </div>
                             </div>

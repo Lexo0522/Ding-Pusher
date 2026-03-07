@@ -185,18 +185,24 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 		}
 
 		private function post_message_data( WP_Post $post, $settings, $context ) {
-			$title    = html_entity_decode( get_the_title( $post ), ENT_QUOTES, get_bloginfo( 'charset' ) ?: 'UTF-8' );
-			$link     = get_permalink( $post );
-			$excerpt  = has_excerpt( $post ) ? wp_strip_all_tags( $post->post_excerpt ) : wp_trim_words( wp_strip_all_tags( strip_shortcodes( $post->post_content ) ), 40, '...' );
-			$template = ! empty( $settings['post_template'] ) ? $settings['post_template'] : dtpwp_defaults()['post_template'];
-			$body     = strtr(
+			$title        = html_entity_decode( get_the_title( $post ), ENT_QUOTES, get_bloginfo( 'charset' ) ?: 'UTF-8' );
+			$link         = get_permalink( $post );
+			$excerpt      = has_excerpt( $post ) ? wp_strip_all_tags( $post->post_excerpt ) : wp_trim_words( wp_strip_all_tags( strip_shortcodes( $post->post_content ) ), 40, '...' );
+			$category     = $this->post_category_text( $post );
+			$publish_time = $this->post_publish_time( $post );
+			$template     = ! empty( $settings['post_template'] ) ? $settings['post_template'] : dtpwp_defaults()['post_template'];
+			$body         = strtr(
 				$template,
 				array(
 					'{title}'        => $title,
 					'{author}'       => get_the_author_meta( 'display_name', (int) $post->post_author ),
 					'{link}'         => $link,
 					'{excerpt}'      => $excerpt,
-					'{publish_time}' => get_date_from_gmt( $post->post_date_gmt, 'Y-m-d H:i:s' ),
+					'{category}'     => $category,
+					'{categories}'   => $category,
+					'{date}'         => $publish_time,
+					'{publish_time}' => $publish_time,
+					'{post_date}'    => $publish_time,
 					'{post_type}'    => $post->post_type,
 				)
 			);
@@ -275,6 +281,7 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 			if ( ! $url ) {
 				return false;
 			}
+
 			$response = wp_remote_post(
 				$url,
 				array(
@@ -284,18 +291,17 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 				)
 			);
 			if ( is_wp_error( $response ) ) {
-				$this->log_error( 'Transport error: ' . $response->get_error_message() );
 				return false;
 			}
 			$code = (int) wp_remote_retrieve_response_code( $response );
-			$body = json_decode( wp_remote_retrieve_body( $response ), true );
+			$raw_body = wp_remote_retrieve_body( $response );
+			$body     = json_decode( $raw_body, true );
+
 			if ( $code < 200 || $code >= 300 ) {
-				$this->log_error( 'Unexpected HTTP status: ' . $code );
 				return false;
 			}
 			if ( is_array( $body ) && isset( $body['errcode'] ) && 0 !== (int) $body['errcode'] ) {
 				$this->last_error = ! empty( $body['errmsg'] ) ? $body['errmsg'] : 'Unknown DingTalk error';
-				$this->log_error( 'DingTalk rejected the payload: ' . $this->last_error );
 				return false;
 			}
 			$this->last_error = '';
@@ -307,19 +313,19 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 			if ( ! $url || false === strpos( $url, 'https://oapi.dingtalk.com/robot/send' ) ) {
 				return '';
 			}
-			if ( 'secret' !== sanitize_key( isset( $settings['security_type'] ) ? $settings['security_type'] : 'keyword' ) || empty( $settings['security_secret'] ) ) {
+
+			$security_type = sanitize_key( isset( $settings['security_type'] ) ? $settings['security_type'] : 'keyword' );
+			$secret        = isset( $settings['security_secret'] ) ? trim( (string) $settings['security_secret'] ) : '';
+
+			if ( 'secret' !== $security_type || '' === $secret ) {
 				return $url;
 			}
-			$timestamp = (string) round( microtime( true ) * 1000 );
-			$secret    = (string) $settings['security_secret'];
-			$sign      = base64_encode( hash_hmac( 'sha256', $timestamp . "\n" . $secret, $secret, true ) );
-			return add_query_arg(
-				array(
-					'timestamp' => $timestamp,
-					'sign'      => $sign,
-				),
-				$url
-			);
+
+			$timestamp  = (string) round( microtime( true ) * 1000 );
+			$sign       = base64_encode( hash_hmac( 'sha256', $timestamp . "\n" . $secret, $secret, true ) );
+			$base_url   = remove_query_arg( array( 'timestamp', 'sign' ), $url );
+			$separator  = false === strpos( $base_url, '?' ) ? '?' : '&';
+			return $base_url . $separator . 'timestamp=' . rawurlencode( $timestamp ) . '&sign=' . rawurlencode( $sign );
 		}
 
 		private function has_webhook( $settings ) {
@@ -367,7 +373,6 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 
 		private function schedule_post_retry( $post_id, $attempt, $context, $settings ) {
 			if ( $attempt >= max( 1, absint( $settings['retry_count'] ) ) ) {
-				$this->log_error( 'Post push failed after max retries for post ' . $post_id . '.' );
 				return;
 			}
 			$next  = $attempt + 1;
@@ -380,7 +385,6 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 
 		private function schedule_user_retry( $user_id, $attempt, $settings ) {
 			if ( $attempt >= max( 1, absint( $settings['retry_count'] ) ) ) {
-				$this->log_error( 'User push failed after max retries for user ' . $user_id . '.' );
 				return;
 			}
 			$next  = $attempt + 1;
@@ -408,10 +412,55 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 			delete_transient( 'dtpwp_lock_' . md5( $key ) );
 		}
 
-		private function log_error( $message ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( '[Ding Pusher] ' . $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		private function post_category_text( WP_Post $post ) {
+			$names = array();
+			$terms = get_the_terms( $post, 'category' );
+
+			if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+				foreach ( $terms as $term ) {
+					if ( ! empty( $term->name ) ) {
+						$names[] = wp_strip_all_tags( $term->name );
+					}
+				}
 			}
+
+			if ( empty( $names ) ) {
+				$taxonomies = get_object_taxonomies( $post->post_type, 'objects' );
+				foreach ( $taxonomies as $taxonomy ) {
+					if ( empty( $taxonomy->public ) || empty( $taxonomy->hierarchical ) ) {
+						continue;
+					}
+
+					$taxonomy_terms = get_the_terms( $post, $taxonomy->name );
+					if ( is_wp_error( $taxonomy_terms ) || empty( $taxonomy_terms ) ) {
+						continue;
+					}
+
+					foreach ( $taxonomy_terms as $term ) {
+						if ( ! empty( $term->name ) ) {
+							$names[] = wp_strip_all_tags( $term->name );
+						}
+					}
+				}
+			}
+
+			$names = array_values( array_unique( array_filter( $names ) ) );
+
+			return ! empty( $names ) ? implode( '、', $names ) : '未分类';
+		}
+
+		private function post_publish_time( WP_Post $post ) {
+			$time = get_post_time( 'Y-m-d H:i:s', false, $post );
+
+			if ( ! empty( $time ) ) {
+				return $time;
+			}
+
+			if ( ! empty( $post->post_date ) && '0000-00-00 00:00:00' !== $post->post_date ) {
+				return mysql2date( 'Y-m-d H:i:s', $post->post_date, false );
+			}
+
+			return '';
 		}
 	}
 }

@@ -163,7 +163,7 @@ class Ding_Pusher_Admin {
         $input = is_array( $input ) ? $input : array();
         $valid = array();
 
-        $webhook_url = isset( $input['webhook_url'] ) ? sanitize_text_field( $input['webhook_url'] ) : '';
+        $webhook_url = isset( $input['webhook_url'] ) ? trim( sanitize_text_field( $input['webhook_url'] ) ) : '';
         if ( ! empty( $webhook_url ) && ! preg_match( '/^https:\/\/oapi\.dingtalk\.com\/robot\/send/', $webhook_url ) ) {
             add_settings_error( 'dtpwp_settings', 'invalid_webhook', __( 'Webhook URL 格式不正确，请检查。', 'ding-pusher' ) );
         }
@@ -173,7 +173,7 @@ class Ding_Pusher_Admin {
         $valid['security_keyword'] = isset( $input['security_keyword'] ) && is_array( $input['security_keyword'] )
             ? array_values( array_filter( array_map( 'sanitize_text_field', $input['security_keyword'] ), 'strlen' ) )
             : array();
-        $valid['security_secret'] = isset( $input['security_secret'] ) ? sanitize_text_field( $input['security_secret'] ) : '';
+        $valid['security_secret'] = isset( $input['security_secret'] ) ? trim( sanitize_text_field( $input['security_secret'] ) ) : '';
         $valid['security_ip_whitelist'] = isset( $input['security_ip_whitelist'] ) && is_array( $input['security_ip_whitelist'] )
             ? array_values( array_filter( array_map( 'sanitize_text_field', $input['security_ip_whitelist'] ), 'strlen' ) )
             : array();
@@ -551,9 +551,9 @@ class Ding_Pusher_Admin {
         $raw_settings = isset( $_POST['settings'] ) && is_array( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : array();
 
         $test_settings = $settings;
-        $test_settings['webhook_url'] = isset( $raw_settings['webhook_url'] ) ? esc_url_raw( $raw_settings['webhook_url'] ) : $settings['webhook_url'];
+        $test_settings['webhook_url'] = isset( $raw_settings['webhook_url'] ) ? trim( esc_url_raw( $raw_settings['webhook_url'] ) ) : $settings['webhook_url'];
         $test_settings['security_type'] = isset( $raw_settings['security_type'] ) ? sanitize_text_field( $raw_settings['security_type'] ) : $settings['security_type'];
-        $test_settings['security_secret'] = isset( $raw_settings['security_secret'] ) ? sanitize_text_field( $raw_settings['security_secret'] ) : $settings['security_secret'];
+        $test_settings['security_secret'] = isset( $raw_settings['security_secret'] ) ? trim( sanitize_text_field( $raw_settings['security_secret'] ) ) : $settings['security_secret'];
         $test_settings['message_type'] = isset( $raw_settings['message_type'] ) ? sanitize_text_field( $raw_settings['message_type'] ) : $settings['message_type'];
 
         if ( empty( $test_settings['webhook_url'] ) ) {
