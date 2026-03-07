@@ -1,0 +1,17 @@
+{
+  "version": "1.0.1",
+  "download_url": "https://github.com/Lexo0522/Ding-Pusher/archive/refs/tags/v1.0.1.zip",
+  "homepage": "https://github.com/Lexo0522/Ding-Pusher",
+  "author": "Kate522",
+  "author_profile": "https://github.com/Lexo0522",
+  "requires": "5.8",
+  "tested": "6.6",
+  "requires_php": "7.4",
+  "description": "自动检测WordPress新文章并通过钉钉机器人推送，包含去重机制和新用户提示功能",
+  "installation": "1. 下载插件压缩包\n2. 登录WordPress后台，进入「插件」→「安装插件」→「上传插件」\n3. 选择下载的压缩包，点击「现在安装」\n4. 安装完成后，点击「激活插件」",
+  "changelog": "= 1.0.1 =\n* 修复了推送记录页面取消标记按钮的问题\n* 优化了推送记录页面的消息内容显示\n* 移除了不必要的编辑按钮\n* 改进了自动更新功能",
+  "banners": {
+    "low": "https://raw.githubusercontent.com/Lexo0522/Ding-Pusher/master/assets/banner-772x250.jpg",
+    "high": "https://raw.githubusercontent.com/Lexo0522/Ding-Pusher/master/assets/banner-1544x500.jpg"
+  }
+}
