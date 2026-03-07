@@ -283,7 +283,7 @@ class Ding_Pusher_Admin {
         // 验证Webhook URL
         $webhook_url = sanitize_text_field( $input['webhook_url'] );
         if ( ! empty( $webhook_url ) && ! preg_match( '/^https:\/\/oapi\.dingtalk\.com\/robot\/send/', $webhook_url ) ) {
-            add_settings_error( 'dtpwp_settings', 'invalid_webhook', __( 'Webhook URL格式不正确，请检查。', 'ding-pusher' ) );
+            add_settings_error( 'dtpwp_settings', 'invalid_webhook', __( 'Webhook URL 格式不正确，请检查。', 'ding-pusher' ) );
         }
         $valid['webhook_url'] = $webhook_url;
         
@@ -378,7 +378,7 @@ class Ding_Pusher_Admin {
      */
     public function render_security_keyword_field() {
         $security_keyword = isset( $this->settings['security_keyword'] ) ? $this->settings['security_keyword'] : array();
-        echo '<div id="dtpwp-keyword-list">';
+        echo '<div id="dtpwp-security-keyword"><div id="dtpwp-keyword-list">';
         foreach ( $security_keyword as $index => $keyword ) {
             echo '<div class="keyword-item">';
             echo '<input type="text" name="' . DTPWP_OPTION_NAME . '[security_keyword][]" value="' . esc_attr( $keyword ) . '" class="regular-text" />';
@@ -391,7 +391,7 @@ class Ding_Pusher_Admin {
             echo '<button type="button" class="button button-link-delete dtpwp-remove-keyword">' . __( '删除', 'ding-pusher' ) . '</button>';
             echo '</div>';
         }
-        echo '</div>';
+        echo '</div></div>';
         echo '<button type="button" class="button button-secondary dtpwp-add-keyword">' . __( '添加关键词', 'ding-pusher' ) . '</button>';
     }
     
@@ -400,8 +400,10 @@ class Ding_Pusher_Admin {
      */
     public function render_security_secret_field() {
         $security_secret = isset( $this->settings['security_secret'] ) ? $this->settings['security_secret'] : '';
+        echo '<div id="dtpwp-security-secret">';
         echo '<input type="text" name="' . DTPWP_OPTION_NAME . '[security_secret]" value="' . esc_attr( $security_secret ) . '" class="regular-text" />';
         echo '<p class="description">' . __( '请输入钉钉机器人的加签密钥，用于生成签名。', 'ding-pusher' ) . '</p>';
+        echo '</div>';
     }
     
     /**
@@ -409,7 +411,7 @@ class Ding_Pusher_Admin {
      */
     public function render_security_ip_whitelist_field() {
         $security_ip_whitelist = isset( $this->settings['security_ip_whitelist'] ) ? $this->settings['security_ip_whitelist'] : array();
-        echo '<div id="dtpwp-ip-list">';
+        echo '<div id="dtpwp-security-ip-whitelist"><div id="dtpwp-ip-list">';
         foreach ( $security_ip_whitelist as $index => $ip ) {
             echo '<div class="ip-item">';
             echo '<input type="text" name="' . DTPWP_OPTION_NAME . '[security_ip_whitelist][]" value="' . esc_attr( $ip ) . '" class="regular-text" />';
@@ -422,7 +424,7 @@ class Ding_Pusher_Admin {
             echo '<button type="button" class="button button-link-delete dtpwp-remove-ip">' . __( '删除', 'ding-pusher' ) . '</button>';
             echo '</div>';
         }
-        echo '</div>';
+        echo '</div></div>';
         echo '<button type="button" class="button button-secondary dtpwp-add-ip">' . __( '添加IP', 'ding-pusher' ) . '</button>';
     }
     
@@ -647,7 +649,7 @@ class Ding_Pusher_Admin {
                         <?php endwhile; ?>
                     <?php else : ?>
                         <tr>
-                            <td colspan="5" class="colspanchange"><?php _e( '暂无推送记录。', 'ding-pusher' ); ?></td>
+                            <td colspan="5" class="colspan-change"><?php _e( '暂无推送记录。', 'ding-pusher' ); ?></td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -716,14 +718,28 @@ class Ding_Pusher_Admin {
         check_ajax_referer( 'dtpwp_nonce', 'nonce' );
         
         $settings = get_option( DTPWP_OPTION_NAME );
-        if ( empty( $settings['webhook_url'] ) ) {
+        $raw_settings = isset( $_POST['settings'] ) && is_array( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : array();
+        $test_settings = array(
+            'webhook_url' => isset( $raw_settings['webhook_url'] ) ? esc_url_raw( $raw_settings['webhook_url'] ) : $settings['webhook_url'],
+            'security_type' => isset( $raw_settings['security_type'] ) ? sanitize_text_field( $raw_settings['security_type'] ) : $settings['security_type'],
+            'security_secret' => isset( $raw_settings['security_secret'] ) ? sanitize_text_field( $raw_settings['security_secret'] ) : $settings['security_secret'],
+            'message_type' => isset( $raw_settings['message_type'] ) ? sanitize_text_field( $raw_settings['message_type'] ) : $settings['message_type'],
+            'retry_count' => isset( $settings['retry_count'] ) ? absint( $settings['retry_count'] ) : 3,
+            'retry_interval' => isset( $settings['retry_interval'] ) ? absint( $settings['retry_interval'] ) : 10,
+        );
+
+        if ( empty( $test_settings['webhook_url'] ) ) {
             wp_send_json_error( array( 'message' => __( '请先填写Webhook地址', 'ding-pusher' ) ) );
+        }
+
+        if ( ! preg_match( '/^https:\/\/oapi\.dingtalk\.com\/robot\/send/', $test_settings['webhook_url'] ) ) {
+            wp_send_json_error( array( 'message' => __( 'Webhook URL 格式不正确，请检查。', 'ding-pusher' ) ) );
         }
         
         // 发送测试消息
         $message = __( '这是一条测试消息，来自Ding Pusher插件', 'ding-pusher' );
         $core = Ding_Pusher_Core::get_instance();
-        $success = $core->send_dingtalk_message( $message );
+        $success = $core->send_dingtalk_message( $message, $test_settings );
         
         if ( $success ) {
             wp_send_json_success( array( 'message' => __( '测试消息发送成功', 'ding-pusher' ) ) );

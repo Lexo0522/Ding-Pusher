@@ -547,7 +547,7 @@ class Ding_Pusher_Core {
             )
         ", DTPWP_SENT_META_KEY, $cutoff_date ) );
         
-        // 清理标题哈希记录（保留最近30天）
+        // 清理标题哈希记录（按数量保留最近1000条）
         $sent_hashes = get_option( 'dtpwp_sent_title_hashes', array() );
         if ( count( $sent_hashes ) > 1000 ) {
             // 只保留最近1000条

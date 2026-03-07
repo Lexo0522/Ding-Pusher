@@ -13,7 +13,13 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'dtpwp_test_message',
-                nonce: dtpwp_ajax.nonce
+                nonce: dtpwp_ajax.nonce,
+                settings: {
+                    webhook_url: $('input[name="dtpwp_dingtalk_settings[webhook_url]"]').val(),
+                    security_type: $('select[name="dtpwp_dingtalk_settings[security_type]"]').val(),
+                    security_secret: $('input[name="dtpwp_dingtalk_settings[security_secret]"]').val(),
+                    message_type: $('select[name="dtpwp_dingtalk_settings[message_type]"]').val()
+                }
             },
             success: function(response) {
                 if (response.success) {
