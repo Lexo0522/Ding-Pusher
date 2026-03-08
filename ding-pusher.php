@@ -6,7 +6,7 @@
  * Version: 1.0.2
  * Author: Kate522
  * Author URI: https://github.com/Lexo0522
- * Requires at least: 5.8
+ * Requires at least: 6.9
  * Requires PHP: 7.4
  * Text Domain: ding-pusher
  * Domain Path: /languages
