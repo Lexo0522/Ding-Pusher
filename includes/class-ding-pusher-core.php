@@ -97,7 +97,7 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 			if ( ! $this->has_webhook( $settings ) ) {
 				return false;
 			}
-			$title = ! empty( $settings['custom_message'] ) ? $settings['custom_message'] : '站点通知';
+			$title = ! empty( $settings['custom_message'] ) ? $settings['custom_message'] : __( '站点通知', 'ding-pusher' );
 			$data  = $this->build_payload( $title, (string) $message, home_url( '/' ), $settings );
 			return ! empty( $data['payload'] ) ? $this->send_payload( $data['payload'], $settings ) : false;
 		}
@@ -207,9 +207,10 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 				)
 			);
 			if ( 'update' === $context ) {
-				$body = "【文章更新】\n" . $body;
+				$body = sprintf( "%s\n", __( '【文章更新】', 'ding-pusher' ) ) . $body;
 			}
-			$subject = ! empty( $settings['custom_message'] ) ? $settings['custom_message'] : ( 'update' === $context ? '文章已更新：' : '新文章：' ) . $title;
+			$subject_prefix = 'update' === $context ? __( '文章已更新：', 'ding-pusher' ) : __( '新文章：', 'ding-pusher' );
+			$subject = ! empty( $settings['custom_message'] ) ? $settings['custom_message'] : $subject_prefix . $title;
 			return $this->build_payload( $subject, $body, $link, $settings, get_the_post_thumbnail_url( $post, 'medium' ) );
 		}
 
@@ -225,7 +226,7 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 					'{register_time}' => ! empty( $user->user_registered ) ? mysql2date( 'Y-m-d H:i:s', $user->user_registered, false ) : current_time( 'mysql' ),
 				)
 			);
-			$subject = ! empty( $settings['custom_message'] ) ? $settings['custom_message'] : '新用户注册：' . $user->user_login;
+			$subject = ! empty( $settings['custom_message'] ) ? $settings['custom_message'] : __( '新用户注册：', 'ding-pusher' ) . $user->user_login;
 			return $this->build_payload( $subject, $body, admin_url( 'user-edit.php?user_id=' . $user->ID ), $settings );
 		}
 
@@ -240,7 +241,7 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 				$title = trim( $keyword . ' ' . $title );
 				$body  = trim( $keyword . "\n" . $body );
 			}
-			$title = $title ? $title : '站点通知';
+			$title = $title ? $title : __( '站点通知', 'ding-pusher' );
 			$body  = $body ? $body : $title;
 			if ( 'link' === $type ) {
 				return array(
@@ -257,7 +258,8 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 				);
 			}
 			if ( 'markdown' === $type ) {
-				$text = '## ' . $title . "\n\n" . str_replace( "\r\n", "\n", $body ) . ( $url ? "\n\n[查看链接](" . $url . ')' : '' );
+				$link_text = $url ? "\n\n[" . __( '查看链接', 'ding-pusher' ) . '](' . $url . ')' : '';
+				$text = '## ' . $title . "\n\n" . str_replace( "\r\n", "\n", $body ) . $link_text;
 				return array(
 					'payload' => array(
 						'msgtype'  => 'markdown',
@@ -301,7 +303,7 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 				return false;
 			}
 			if ( is_array( $body ) && isset( $body['errcode'] ) && 0 !== (int) $body['errcode'] ) {
-				$this->last_error = ! empty( $body['errmsg'] ) ? $body['errmsg'] : 'Unknown DingTalk error';
+				$this->last_error = ! empty( $body['errmsg'] ) ? $body['errmsg'] : __( 'Unknown DingTalk error', 'ding-pusher' );
 				return false;
 			}
 			$this->last_error = '';
@@ -446,7 +448,8 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 
 			$names = array_values( array_unique( array_filter( $names ) ) );
 
-			return ! empty( $names ) ? implode( '、', $names ) : '未分类';
+			$separator = __( '、', 'ding-pusher' );
+			return ! empty( $names ) ? implode( $separator, $names ) : __( '未分类', 'ding-pusher' );
 		}
 
 		private function post_publish_time( WP_Post $post ) {

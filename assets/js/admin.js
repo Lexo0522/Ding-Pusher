@@ -4,7 +4,21 @@ jQuery(document).ready(function($) {
     var storageKey = 'dtpwp_admin_ui_state_v1';
     var recordsStorageKey = 'dtpwp_records_ui_state_v1';
     var ajaxConfig = window.dtpwp_ajax || {};
+    var i18n = ajaxConfig.i18n || {};
     var toastTimer = null;
+
+    function t(key, fallback) {
+        if (i18n && Object.prototype.hasOwnProperty.call(i18n, key)) {
+            return i18n[key];
+        }
+        return fallback || '';
+    }
+
+    function format(template, value) {
+        return String(template || '')
+            .replace('%s', value)
+            .replace('%d', value);
+    }
 
     function getState() {
         try {
@@ -160,13 +174,13 @@ jQuery(document).ready(function($) {
 
     function formatWebhookLabel(url) {
         if (!url) {
-            return 'Webhook: 未配置';
+            return t('webhook_not_configured');
         }
         var match = String(url).match(/^https?:\/\/([^/]+)/i);
         if (match && match[1]) {
-            return 'Webhook: ' + match[1];
+            return t('webhook_prefix') + match[1];
         }
-        return 'Webhook: 已配置';
+        return t('webhook_configured');
     }
 
     function parseTemplateLines(text) {
@@ -240,7 +254,7 @@ jQuery(document).ready(function($) {
         var $toggle = $panel.find('.dtpwp-panel-toggle').first();
         $panel.toggleClass('is-collapsed', collapsed);
         $toggle.attr('aria-expanded', collapsed ? 'false' : 'true');
-        $toggle.text(collapsed ? '展开' : '收起');
+        $toggle.text(collapsed ? t('expand') : t('collapse'));
 
         if (!skipStore) {
             uiState.collapsed[$panel.data('panel-id')] = collapsed;
@@ -310,42 +324,42 @@ jQuery(document).ready(function($) {
             preset = 'clean';
         }
 
-        var fallbackTitle = templateLines[0] || '站点通知';
-        var title = customMessage ? '自定义消息' : fallbackTitle;
-        title = title.replace(/^[#*\-\s【】]+/g, '').trim() || '站点通知';
+        var fallbackTitle = templateLines[0] || t('site_notice');
+        var title = customMessage ? t('custom_message') : fallbackTitle;
+        title = title.replace(/^[#*\-\s【】]+/g, '').trim() || t('site_notice');
 
-        var body = customMessage || templateLines.slice(1).join('\n') || templateLines[0] || '未设置消息内容';
+        var body = customMessage || templateLines.slice(1).join('\n') || templateLines[0] || t('empty_message');
         var urlMatch = (body + '\n' + templateText).match(/https?:\/\/[^\s]+/);
         var linkUrl = urlMatch ? urlMatch[0] : 'https://example.com/post/123';
-        var linkTitle = title || '消息通知';
+        var linkTitle = title || t('message_notice');
 
         var mdLines = customMessage ? parseTemplateLines(customMessage) : templateLines;
-        var mdTitle = mdLines[0] || '# Markdown 通知';
+        var mdTitle = mdLines[0] || t('markdown_notice');
         if (mdTitle.indexOf('#') !== 0) {
             mdTitle = '# ' + mdTitle;
         }
         var mdItems = mdLines.slice(1, 4);
         if (!mdItems.length) {
-            mdItems = ['标题：示例内容', '作者：Admin', '状态：已发布'];
+            mdItems = [t('example_title'), t('example_author'), t('example_status')];
         }
 
-        var nestedText = '嵌套：未启用';
+        var nestedText = t('nested_disabled');
         if (advancedEnabled && nestedEnabled) {
-            nestedText = '嵌套：' + ($.trim(nestedNote) || '已启用');
+            nestedText = t('nested_prefix') + ($.trim(nestedNote) || t('nested_enabled'));
         }
 
         var messageTypeLabels = {
-            text: '文本消息',
-            link: '链接消息',
-            markdown: 'Markdown 消息'
+            text: t('message_type_text'),
+            link: t('message_type_link'),
+            markdown: t('message_type_markdown')
         };
-        var modeText = messageTypeLabels[messageType] || '文本消息';
+        var modeText = messageTypeLabels[messageType] || t('message_type_text');
         var presetLabels = {
-            clean: '清爽',
-            compact: '紧凑',
-            bold: '强调'
+            clean: t('preset_clean'),
+            compact: t('preset_compact'),
+            bold: t('preset_bold')
         };
-        var presetText = presetLabels[preset] || '清爽';
+        var presetText = presetLabels[preset] || t('preset_clean');
 
         var $bubble = $('#dtpwp-preview-bubble');
         $bubble
@@ -365,12 +379,12 @@ jQuery(document).ready(function($) {
         }).join(''));
 
         $('#dtpwp-preview-mode').text(modeText);
-        $('#dtpwp-preview-preset-badge').text('预设：' + presetText);
+        $('#dtpwp-preview-preset-badge').text(t('preset_prefix') + presetText);
         $('#dtpwp-preview-type-inline').text(modeText);
-        $('#dtpwp-preview-advanced').text(advancedEnabled ? '高级功能：开启' : '高级功能：关闭');
+        $('#dtpwp-preview-advanced').text(advancedEnabled ? t('advanced_enabled') : t('advanced_disabled'));
         $('#dtpwp-preview-nested').text(nestedText);
         $('#dtpwp-preview-webhook').text(formatWebhookLabel(webhookUrl));
-        $('#dtpwp-preview-push').text('间隔：' + pushInterval + ' 分钟');
+        $('#dtpwp-preview-push').text(format(t('push_interval_format', '间隔：%d 分钟'), pushInterval));
         $('#dtpwp-preview-color').text(color);
         $('#dtpwp-preview-preset-text').text(presetText);
 
@@ -387,7 +401,7 @@ jQuery(document).ready(function($) {
             $('<button>', {
                 type: 'button',
                 class: 'button button-link-delete dtpwp-remove-keyword',
-                text: '删除'
+                text: t('delete')
             })
         );
     }
@@ -402,7 +416,7 @@ jQuery(document).ready(function($) {
             $('<button>', {
                 type: 'button',
                 class: 'button button-link-delete dtpwp-remove-ip',
-                text: '删除'
+                text: t('delete')
             })
         );
     }
@@ -515,7 +529,7 @@ jQuery(document).ready(function($) {
         });
 
         $('#dtpwp-settings-form').on('submit', function() {
-            showToast('正在保存设置...', 'success', 1200);
+            showToast(t('saving_settings'), 'success', 1200);
         });
 
         $('#dtpwp-reset-layout').on('click', function() {
@@ -524,7 +538,7 @@ jQuery(document).ready(function($) {
         });
 
         if (parseInt(ajaxConfig.settings_updated || 0, 10) === 1) {
-            showToast('设置已保存', 'success', 2800);
+            showToast(t('settings_saved'), 'success', 2800);
         }
 
         updatePreview();
@@ -544,9 +558,23 @@ jQuery(document).ready(function($) {
         var $fields = $('.dtpwp-export-fields-panel input[type="checkbox"]');
         var $perPage = $('#dtpwp-per-page');
         var currentPerPage = parseInt($records.data('per-page'), 10);
+        var xlsxAvailable = parseInt(ajaxConfig.xlsx_available || 0, 10) === 1;
 
         if ($format.length && state.exportFormat) {
             $format.val(state.exportFormat);
+        }
+
+        if ($format.length && !xlsxAvailable) {
+            var $xlsxOption = $format.find('option[value="xlsx"]');
+            if ($xlsxOption.length) {
+                $xlsxOption.prop('disabled', true);
+                if ($format.val() === 'xlsx') {
+                    $format.val('csv');
+                    state.exportFormat = 'csv';
+                    saveRecordsState(state);
+                    showToast(t('xlsx_unavailable', 'XLSX export requires the PHP ZipArchive extension. Switched to CSV.'), 'error', 3200);
+                }
+            }
         }
 
         if ($fields.length && state.exportFields.length) {
@@ -599,7 +627,7 @@ jQuery(document).ready(function($) {
             var $button = $(this);
             var originalText = $button.text();
 
-            $button.prop('disabled', true).text('发送中...');
+            $button.prop('disabled', true).text(t('sending'));
 
             $.ajax({
                 url: ajaxConfig.ajax_url,
@@ -618,10 +646,10 @@ jQuery(document).ready(function($) {
                 if (response && response.data && response.data.message) {
                     showToast(response.data.message, response.success ? 'success' : 'error', 3000);
                 } else {
-                    showToast('测试消息返回格式异常', 'error', 3000);
+                    showToast(t('test_response_invalid'), 'error', 3000);
                 }
             }).fail(function() {
-                showToast('测试消息发送失败，请检查网络连接。', 'error', 3000);
+                showToast(t('test_send_failed'), 'error', 3000);
             }).always(function() {
                 $button.prop('disabled', false).text(originalText);
             });
@@ -637,12 +665,12 @@ jQuery(document).ready(function($) {
             var ids = getSelectedRecordIds();
 
             if (!bulkAction) {
-                showToast('请选择批量操作类型。', 'error', 2400);
+                showToast(t('bulk_action_required'), 'error', 2400);
                 return;
             }
 
             if (!ids.length) {
-                showToast('请先勾选需要操作的记录。', 'error', 2400);
+                showToast(t('bulk_records_required'), 'error', 2400);
                 return;
             }
 
@@ -654,7 +682,7 @@ jQuery(document).ready(function($) {
             }
 
             var $button = $(this);
-            $button.prop('disabled', true).text('处理中...');
+            $button.prop('disabled', true).text(t('processing'));
 
             $.ajax({
                 url: ajaxConfig.ajax_url,
@@ -673,15 +701,15 @@ jQuery(document).ready(function($) {
                             updateRecordsCount(-1);
                         });
                     });
-                    var actionLabel = bulkAction === 'delete_record' ? '记录已删除' : '记录已取消标记';
+                    var actionLabel = bulkAction === 'delete_record' ? t('record_deleted') : t('record_unmarked');
                     showToast(actionLabel, 'success', 2600);
                 } else {
-                    showToast(response.data && response.data.message ? response.data.message : '批量操作失败', 'error', 2800);
+                    showToast(response.data && response.data.message ? response.data.message : t('bulk_failed'), 'error', 2800);
                 }
             }).fail(function() {
-                showToast('批量操作失败，请重试。', 'error', 2800);
+                showToast(t('bulk_failed'), 'error', 2800);
             }).always(function() {
-                $button.prop('disabled', false).text('应用');
+                $button.prop('disabled', false).text(t('apply'));
             });
         });
 
@@ -692,17 +720,17 @@ jQuery(document).ready(function($) {
             var totalCount = parseInt($('#dtpwp-records-count').text(), 10);
 
             if (!fields.length) {
-                showToast('请至少选择一个导出字段。', 'error', 2400);
+                showToast(t('export_field_required'), 'error', 2400);
                 return;
             }
 
             if (!ids.length && exportMax && totalCount > exportMax) {
-                showToast('记录过多，请先勾选需要导出的记录。', 'error', 2800);
+                showToast(t('export_too_many'), 'error', 2800);
                 return;
             }
 
             if ($button && $button.length) {
-                $button.prop('disabled', true).text('生成中...');
+                $button.prop('disabled', true).text(t('export_generating'));
             }
 
             $.ajax({
@@ -717,25 +745,25 @@ jQuery(document).ready(function($) {
                 }
             }).done(function(response) {
                 if (response && response.success && response.data && response.data.download_url) {
-                    showToast('导出已准备，开始下载。', 'success', 2600);
+                    showToast(t('export_ready'), 'success', 2600);
                     window.location.href = response.data.download_url;
                     return;
                 }
 
                 var message = response && response.data && response.data.message
                     ? response.data.message
-                    : '导出失败，请稍后重试。';
+                    : t('export_failed');
                 showToast(message, 'error', 2800);
             }).fail(function() {
                 var fallbackUrl = buildExportUrl(ids, fields, format);
                 if (fallbackUrl) {
                     window.location.href = fallbackUrl;
                 } else {
-                    showToast('导出失败，请重试。', 'error', 2800);
+                    showToast(t('export_failed'), 'error', 2800);
                 }
             }).always(function() {
                 if ($button && $button.length) {
-                    var label = $button.attr('id') === 'dtpwp-export-all' ? '导出全部' : '导出选中';
+                    var label = $button.attr('id') === 'dtpwp-export-all' ? t('export_all') : t('export_selected');
                     $button.prop('disabled', false).text(label);
                 }
             });
@@ -744,7 +772,7 @@ jQuery(document).ready(function($) {
         $(document).on('click', '#dtpwp-export-selected', function() {
             var ids = getSelectedRecordIds();
             if (!ids.length) {
-                showToast('请先勾选需要导出的记录。', 'error', 2400);
+                showToast(t('export_records_required'), 'error', 2400);
                 return;
             }
             requestExport(ids, $(this));
@@ -766,11 +794,11 @@ jQuery(document).ready(function($) {
             var $button = $(this);
             var postId = $button.data('post-id');
 
-            if (!window.confirm('确定要取消标记这篇文章吗？')) {
+            if (!window.confirm(t('mark_confirm'))) {
                 return;
             }
 
-            $button.prop('disabled', true).text('处理中...');
+            $button.prop('disabled', true).text(t('processing'));
 
             $.ajax({
                 url: ajaxConfig.ajax_url,
@@ -787,14 +815,14 @@ jQuery(document).ready(function($) {
                         $(this).remove();
                         updateRecordsCount(-1);
                     });
-                    showToast('记录已取消标记', 'success', 2600);
+                    showToast(t('record_unmarked'), 'success', 2600);
                 } else {
-                    showToast(response.data && response.data.message ? response.data.message : '操作失败', 'error', 2800);
+                    showToast(response.data && response.data.message ? response.data.message : t('action_failed'), 'error', 2800);
                 }
             }).fail(function() {
-                showToast('操作失败，请重试。', 'error', 2800);
+                showToast(t('action_failed'), 'error', 2800);
             }).always(function() {
-                $button.prop('disabled', false).text('取消标记');
+                $button.prop('disabled', false).text(t('mark_cancel'));
             });
         });
 
@@ -802,11 +830,11 @@ jQuery(document).ready(function($) {
             var $button = $(this);
             var originalText = $button.text();
 
-            if (!window.confirm('确定要清理所有推送记录吗？此操作不可恢复。')) {
+            if (!window.confirm(t('clear_confirm'))) {
                 return;
             }
 
-            $button.prop('disabled', true).text('清理中...');
+            $button.prop('disabled', true).text(t('clearing'));
 
             $.ajax({
                 url: ajaxConfig.ajax_url,
@@ -819,10 +847,10 @@ jQuery(document).ready(function($) {
                 if (response.success) {
                     window.location.reload();
                 } else {
-                    showToast(response.data && response.data.message ? response.data.message : '清理失败', 'error', 3000);
+                    showToast(response.data && response.data.message ? response.data.message : t('clear_failed'), 'error', 3000);
                 }
             }).fail(function() {
-                showToast('清理失败，请重试。', 'error', 3000);
+                showToast(t('clear_failed'), 'error', 3000);
             }).always(function() {
                 $button.prop('disabled', false).text(originalText);
             });

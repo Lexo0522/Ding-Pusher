@@ -13,8 +13,8 @@ $defaults = array(
     'security_ip_whitelist' => array( '' ),
     'message_type' => 'text',
     'custom_message' => '',
-    'post_template' => "【新文章】\n标题：{title}\n作者：{author}\n链接：{link}",
-    'user_template' => "【新用户注册】\n用户名：{username}\n邮箱：{email}\n注册时间：{register_time}",
+    'post_template' => __( "【新文章】\n标题：{title}\n作者：{author}\n链接：{link}", 'ding-pusher' ),
+    'user_template' => __( "【新用户注册】\n用户名：{username}\n邮箱：{email}\n注册时间：{register_time}", 'ding-pusher' ),
     'enable_new_post' => 1,
     'enable_post_update' => 0,
     'enable_custom_post_type' => array(),
@@ -29,7 +29,6 @@ $defaults = array(
     'advanced_mode' => 'smart',
     'enable_nested_feature' => 0,
     'nested_feature_note' => '',
-    'enable_auto_update' => 1,
 );
 
 $settings = wp_parse_args( $settings, $defaults );
@@ -42,7 +41,7 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
 <div class="wrap dtpwp-settings-shell" data-settings-updated="<?php echo $settings_updated ? '1' : '0'; ?>">
     <div class="dtpwp-header">
         <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-        <p>作者主页：https://www.rutua.cn/</p>
+        <p><?php esc_html_e( 'Welcome to your dashboard!', 'ding-pusher' ); ?></p>
     </div>
 
     <?php settings_errors( 'dtpwp_settings' ); ?>
@@ -50,9 +49,9 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
     <form method="post" action="options.php" id="dtpwp-settings-form">
         <?php settings_fields( 'dtpwp_settings' ); ?>
 
-        <div class="dtpwp-tab-nav" role="tablist" aria-label="设置分组">
-            <button type="button" class="dtpwp-tab is-active" data-tab="basic" role="tab" aria-selected="true">基础设置</button>
-            <button type="button" class="dtpwp-tab" data-tab="advanced" role="tab" aria-selected="false">高级设置</button>
+        <div class="dtpwp-tab-nav" role="tablist" aria-label="<?php echo esc_attr__( '设置分组', 'ding-pusher' ); ?>">
+            <button type="button" class="dtpwp-tab is-active" data-tab="basic" role="tab" aria-selected="true"><?php esc_html_e( '基础设置', 'ding-pusher' ); ?></button>
+            <button type="button" class="dtpwp-tab" data-tab="advanced" role="tab" aria-selected="false"><?php esc_html_e( '高级设置', 'ding-pusher' ); ?></button>
         </div>
 
         <div class="dtpwp-layout">
@@ -62,21 +61,21 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                         <article class="dtpwp-settings-panel" data-panel-id="basic-access">
                             <header class="dtpwp-panel-header">
                                 <div class="dtpwp-panel-header-main">
-                                    <span class="dtpwp-drag-handle" title="拖拽排序">⋮⋮</span>
+                                    <span class="dtpwp-drag-handle" title="<?php echo esc_attr__( '拖拽排序', 'ding-pusher' ); ?>">⋮⋮</span>
                                     <div>
-                                        <h2>连接与认证</h2>
-                                        <p>配置钉钉机器人 Webhook 与认证信息。</p>
+                                        <h2><?php esc_html_e( '连接与认证', 'ding-pusher' ); ?></h2>
+                                        <p><?php esc_html_e( '配置钉钉机器人 Webhook 与认证信息。', 'ding-pusher' ); ?></p>
                                     </div>
                                 </div>
-                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true">收起</button>
+                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true"><?php esc_html_e( '收起', 'ding-pusher' ); ?></button>
                             </header>
                             <div class="dtpwp-panel-body">
                                 <div class="dtpwp-field">
-                                    <label for="dtpwp-webhook-url">Webhook URL</label>
+                                    <label for="dtpwp-webhook-url"><?php esc_html_e( 'Webhook URL', 'ding-pusher' ); ?></label>
                                     <input type="text" id="dtpwp-webhook-url" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[webhook_url]" value="<?php echo esc_attr( $settings['webhook_url'] ); ?>" placeholder="https://oapi.dingtalk.com/robot/send?access_token=xxx" />
                                 </div>
                                 <div class="dtpwp-field">
-                                    <button type="button" class="button button-secondary" id="dtpwp-test-message">发送测试消息</button>
+                                    <button type="button" class="button button-secondary" id="dtpwp-test-message"><?php esc_html_e( '发送测试消息', 'ding-pusher' ); ?></button>
                                 </div>
                             </div>
                         </article>
@@ -84,47 +83,47 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                         <article class="dtpwp-settings-panel" data-panel-id="basic-message">
                             <header class="dtpwp-panel-header">
                                 <div class="dtpwp-panel-header-main">
-                                    <span class="dtpwp-drag-handle" title="拖拽排序">⋮⋮</span>
+                                    <span class="dtpwp-drag-handle" title="<?php echo esc_attr__( '拖拽排序', 'ding-pusher' ); ?>">⋮⋮</span>
                                     <div>
-                                        <h2>消息内容</h2>
-                                        <p>控制消息类型、模板与预设风格。</p>
+                                        <h2><?php esc_html_e( '消息内容', 'ding-pusher' ); ?></h2>
+                                        <p><?php esc_html_e( '控制消息类型、模板与预设风格。', 'ding-pusher' ); ?></p>
                                     </div>
                                 </div>
-                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true">收起</button>
+                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true"><?php esc_html_e( '收起', 'ding-pusher' ); ?></button>
                             </header>
                             <div class="dtpwp-panel-body">
                                 <div class="dtpwp-field-grid">
                                     <div class="dtpwp-field">
-                                        <label for="dtpwp-message-type">消息类型</label>
+                                        <label for="dtpwp-message-type"><?php esc_html_e( '消息类型', 'ding-pusher' ); ?></label>
                                         <select id="dtpwp-message-type" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[message_type]">
-                                            <option value="text" <?php selected( $settings['message_type'], 'text' ); ?>>文本消息</option>
-                                            <option value="link" <?php selected( $settings['message_type'], 'link' ); ?>>链接消息</option>
-                                            <option value="markdown" <?php selected( $settings['message_type'], 'markdown' ); ?>>Markdown 消息</option>
+                                            <option value="text" <?php selected( $settings['message_type'], 'text' ); ?>><?php esc_html_e( '文本消息', 'ding-pusher' ); ?></option>
+                                            <option value="link" <?php selected( $settings['message_type'], 'link' ); ?>><?php esc_html_e( '链接消息', 'ding-pusher' ); ?></option>
+                                            <option value="markdown" <?php selected( $settings['message_type'], 'markdown' ); ?>><?php esc_html_e( 'Markdown 消息', 'ding-pusher' ); ?></option>
                                         </select>
                                     </div>
                                     <div class="dtpwp-field">
-                                        <label for="dtpwp-preview-preset">预设样式</label>
+                                        <label for="dtpwp-preview-preset"><?php esc_html_e( '预设样式', 'ding-pusher' ); ?></label>
                                         <select id="dtpwp-preview-preset" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[preview_preset]">
-                                            <option value="clean" <?php selected( $settings['preview_preset'], 'clean' ); ?>>清爽</option>
-                                            <option value="compact" <?php selected( $settings['preview_preset'], 'compact' ); ?>>紧凑</option>
-                                            <option value="bold" <?php selected( $settings['preview_preset'], 'bold' ); ?>>强调</option>
+                                            <option value="clean" <?php selected( $settings['preview_preset'], 'clean' ); ?>><?php esc_html_e( '清爽', 'ding-pusher' ); ?></option>
+                                            <option value="compact" <?php selected( $settings['preview_preset'], 'compact' ); ?>><?php esc_html_e( '紧凑', 'ding-pusher' ); ?></option>
+                                            <option value="bold" <?php selected( $settings['preview_preset'], 'bold' ); ?>><?php esc_html_e( '强调', 'ding-pusher' ); ?></option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="dtpwp-field">
-                                    <label for="dtpwp-custom-message">自定义消息</label>
-                                    <input type="text" id="dtpwp-custom-message" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[custom_message]" value="<?php echo esc_attr( $settings['custom_message'] ); ?>" placeholder="例如：欢迎使用 Ding Pusher 设置中心" />
+                                    <label for="dtpwp-custom-message"><?php esc_html_e( '自定义消息', 'ding-pusher' ); ?></label>
+                                    <input type="text" id="dtpwp-custom-message" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[custom_message]" value="<?php echo esc_attr( $settings['custom_message'] ); ?>" placeholder="<?php echo esc_attr__( '例如：欢迎使用 Ding Pusher 设置中心', 'ding-pusher' ); ?>" />
                                 </div>
                                 <div class="dtpwp-field-grid">
                                     <div class="dtpwp-field">
-                                        <label for="dtpwp-post-template">文章推送模板</label>
+                                        <label for="dtpwp-post-template"><?php esc_html_e( '文章推送模板', 'ding-pusher' ); ?></label>
                                         <textarea id="dtpwp-post-template" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[post_template]" rows="4"><?php echo esc_textarea( $settings['post_template'] ); ?></textarea>
-                                        <p class="description">可用占位符：{title}、{author}、{link}、{excerpt}、{category}、{categories}、{date}、{publish_time}、{post_date}、{post_type}</p>
+                                        <p class="description"><?php esc_html_e( '可用占位符：{title}、{author}、{link}、{excerpt}、{category}、{categories}、{date}、{publish_time}、{post_date}、{post_type}', 'ding-pusher' ); ?></p>
                                     </div>
                                     <div class="dtpwp-field">
-                                        <label for="dtpwp-user-template">用户提示模板</label>
+                                        <label for="dtpwp-user-template"><?php esc_html_e( '用户提示模板', 'ding-pusher' ); ?></label>
                                         <textarea id="dtpwp-user-template" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[user_template]" rows="4"><?php echo esc_textarea( $settings['user_template'] ); ?></textarea>
-                                        <p class="description">可用占位符：{username}、{email}、{register_time}</p>
+                                        <p class="description"><?php esc_html_e( '可用占位符：{username}、{email}、{register_time}', 'ding-pusher' ); ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -133,32 +132,32 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                         <article class="dtpwp-settings-panel" data-panel-id="basic-trigger">
                             <header class="dtpwp-panel-header">
                                 <div class="dtpwp-panel-header-main">
-                                    <span class="dtpwp-drag-handle" title="拖拽排序">⋮⋮</span>
+                                    <span class="dtpwp-drag-handle" title="<?php echo esc_attr__( '拖拽排序', 'ding-pusher' ); ?>">⋮⋮</span>
                                     <div>
-                                        <h2>触发场景</h2>
-                                        <p>控制文章与用户通知触发条件。</p>
+                                        <h2><?php esc_html_e( '触发场景', 'ding-pusher' ); ?></h2>
+                                        <p><?php esc_html_e( '控制文章与用户通知触发条件。', 'ding-pusher' ); ?></p>
                                     </div>
                                 </div>
-                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true">收起</button>
+                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true"><?php esc_html_e( '收起', 'ding-pusher' ); ?></button>
                             </header>
                             <div class="dtpwp-panel-body">
                                 <div class="dtpwp-switch-list">
                                     <label class="dtpwp-switch-row" for="dtpwp-enable-new-post">
-                                        <span>新文章发布推送</span>
+                                        <span><?php esc_html_e( '新文章发布推送', 'ding-pusher' ); ?></span>
                                         <span class="dtpwp-switch">
                                             <input type="checkbox" id="dtpwp-enable-new-post" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[enable_new_post]" value="1" <?php checked( $settings['enable_new_post'], 1 ); ?> />
                                             <span class="dtpwp-switch-ui"></span>
                                         </span>
                                     </label>
                                     <label class="dtpwp-switch-row" for="dtpwp-enable-post-update">
-                                        <span>文章更新推送</span>
+                                        <span><?php esc_html_e( '文章更新推送', 'ding-pusher' ); ?></span>
                                         <span class="dtpwp-switch">
                                             <input type="checkbox" id="dtpwp-enable-post-update" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[enable_post_update]" value="1" <?php checked( $settings['enable_post_update'], 1 ); ?> />
                                             <span class="dtpwp-switch-ui"></span>
                                         </span>
                                     </label>
                                     <label class="dtpwp-switch-row" for="dtpwp-enable-new-user">
-                                        <span>新用户注册提示</span>
+                                        <span><?php esc_html_e( '新用户注册提示', 'ding-pusher' ); ?></span>
                                         <span class="dtpwp-switch">
                                             <input type="checkbox" id="dtpwp-enable-new-user" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[enable_new_user]" value="1" <?php checked( $settings['enable_new_user'], 1 ); ?> />
                                             <span class="dtpwp-switch-ui"></span>
@@ -167,7 +166,7 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                                 </div>
 
                                 <div class="dtpwp-field">
-                                    <label>启用的自定义文章类型</label>
+                                    <label><?php esc_html_e( '启用的自定义文章类型', 'ding-pusher' ); ?></label>
                                     <div class="dtpwp-checkbox-grid">
                                         <?php foreach ( $post_types as $post_type ) : ?>
                                             <?php if ( 'post' === $post_type->name || 'page' === $post_type->name ) : ?>
@@ -190,58 +189,58 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                         <article class="dtpwp-settings-panel" data-panel-id="advanced-security">
                             <header class="dtpwp-panel-header">
                                 <div class="dtpwp-panel-header-main">
-                                    <span class="dtpwp-drag-handle" title="拖拽排序">⋮⋮</span>
+                                    <span class="dtpwp-drag-handle" title="<?php echo esc_attr__( '拖拽排序', 'ding-pusher' ); ?>">⋮⋮</span>
                                     <div>
-                                        <h2>安全验证</h2>
-                                        <p>根据安全方式显示对应的配置字段。</p>
+                                        <h2><?php esc_html_e( '安全验证', 'ding-pusher' ); ?></h2>
+                                        <p><?php esc_html_e( '根据安全方式显示对应的配置字段。', 'ding-pusher' ); ?></p>
                                     </div>
                                 </div>
-                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true">收起</button>
+                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true"><?php esc_html_e( '收起', 'ding-pusher' ); ?></button>
                             </header>
                             <div class="dtpwp-panel-body">
                                 <div class="dtpwp-field">
-                                    <label for="dtpwp-security-type">安全验证方式</label>
+                                    <label for="dtpwp-security-type"><?php esc_html_e( '安全验证方式', 'ding-pusher' ); ?></label>
                                     <select id="dtpwp-security-type" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[security_type]">
-                                        <option value="keyword" <?php selected( $settings['security_type'], 'keyword' ); ?>>关键词</option>
-                                        <option value="secret" <?php selected( $settings['security_type'], 'secret' ); ?>>加签</option>
-                                        <option value="ip_whitelist" <?php selected( $settings['security_type'], 'ip_whitelist' ); ?>>IP 白名单</option>
+                                        <option value="keyword" <?php selected( $settings['security_type'], 'keyword' ); ?>><?php esc_html_e( '关键词', 'ding-pusher' ); ?></option>
+                                        <option value="secret" <?php selected( $settings['security_type'], 'secret' ); ?>><?php esc_html_e( '加签', 'ding-pusher' ); ?></option>
+                                        <option value="ip_whitelist" <?php selected( $settings['security_type'], 'ip_whitelist' ); ?>><?php esc_html_e( 'IP 白名单', 'ding-pusher' ); ?></option>
                                     </select>
                                 </div>
 
                                 <div id="dtpwp-security-keyword" class="dtpwp-conditional-group">
                                     <div class="dtpwp-field">
-                                        <label>关键词列表</label>
+                                        <label><?php esc_html_e( '关键词列表', 'ding-pusher' ); ?></label>
                                         <div id="dtpwp-keyword-list">
                                             <?php foreach ( $security_keywords as $keyword ) : ?>
                                                 <div class="keyword-item">
                                                     <input type="text" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[security_keyword][]" value="<?php echo esc_attr( $keyword ); ?>" />
-                                                    <button type="button" class="button button-link-delete dtpwp-remove-keyword">删除</button>
+                                                    <button type="button" class="button button-link-delete dtpwp-remove-keyword"><?php esc_html_e( '删除', 'ding-pusher' ); ?></button>
                                                 </div>
                                             <?php endforeach; ?>
                                         </div>
-                                        <button type="button" class="button button-secondary dtpwp-add-keyword">添加关键词</button>
+                                        <button type="button" class="button button-secondary dtpwp-add-keyword"><?php esc_html_e( '添加关键词', 'ding-pusher' ); ?></button>
                                     </div>
                                 </div>
 
                                 <div id="dtpwp-security-secret" class="dtpwp-conditional-group">
                                     <div class="dtpwp-field">
-                                        <label for="dtpwp-security-secret-input">加签密钥</label>
+                                        <label for="dtpwp-security-secret-input"><?php esc_html_e( '加签密钥', 'ding-pusher' ); ?></label>
                                         <input type="text" id="dtpwp-security-secret-input" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[security_secret]" value="<?php echo esc_attr( $settings['security_secret'] ); ?>" />
                                     </div>
                                 </div>
 
                                 <div id="dtpwp-security-ip-whitelist" class="dtpwp-conditional-group">
                                     <div class="dtpwp-field">
-                                        <label>IP 白名单</label>
+                                        <label><?php esc_html_e( 'IP 白名单', 'ding-pusher' ); ?></label>
                                         <div id="dtpwp-ip-list">
                                             <?php foreach ( $security_ips as $ip ) : ?>
                                                 <div class="ip-item">
                                                     <input type="text" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[security_ip_whitelist][]" value="<?php echo esc_attr( $ip ); ?>" />
-                                                    <button type="button" class="button button-link-delete dtpwp-remove-ip">删除</button>
+                                                    <button type="button" class="button button-link-delete dtpwp-remove-ip"><?php esc_html_e( '删除', 'ding-pusher' ); ?></button>
                                                 </div>
                                             <?php endforeach; ?>
                                         </div>
-                                        <button type="button" class="button button-secondary dtpwp-add-ip">添加 IP</button>
+                                        <button type="button" class="button button-secondary dtpwp-add-ip"><?php esc_html_e( '添加 IP', 'ding-pusher' ); ?></button>
                                     </div>
                                 </div>
                             </div>
@@ -250,18 +249,18 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                         <article class="dtpwp-settings-panel" data-panel-id="advanced-options">
                             <header class="dtpwp-panel-header">
                                 <div class="dtpwp-panel-header-main">
-                                    <span class="dtpwp-drag-handle" title="拖拽排序">⋮⋮</span>
+                                    <span class="dtpwp-drag-handle" title="<?php echo esc_attr__( '拖拽排序', 'ding-pusher' ); ?>">⋮⋮</span>
                                     <div>
-                                        <h2>高级能力</h2>
-                                        <p>用于展示更细粒度的配置联动，可按需启用。</p>
+                                        <h2><?php esc_html_e( '高级能力', 'ding-pusher' ); ?></h2>
+                                        <p><?php esc_html_e( '用于展示更细粒度的配置联动，可按需启用。', 'ding-pusher' ); ?></p>
                                     </div>
                                 </div>
-                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true">收起</button>
+                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true"><?php esc_html_e( '收起', 'ding-pusher' ); ?></button>
                             </header>
                             <div class="dtpwp-panel-body">
                                 <div class="dtpwp-switch-list">
                                     <label class="dtpwp-switch-row" for="dtpwp-enable-advanced-features">
-                                        <span>启用高级功能</span>
+                                        <span><?php esc_html_e( '启用高级功能', 'ding-pusher' ); ?></span>
                                         <span class="dtpwp-switch">
                                             <input type="checkbox" id="dtpwp-enable-advanced-features" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[enable_advanced_features]" value="1" <?php checked( $settings['enable_advanced_features'], 1 ); ?> />
                                             <span class="dtpwp-switch-ui"></span>
@@ -272,22 +271,22 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                                 <div id="dtpwp-advanced-feature-fields" class="dtpwp-conditional-group">
                                     <div class="dtpwp-field-grid">
                                         <div class="dtpwp-field">
-                                            <label for="dtpwp-advanced-mode">高级模式</label>
+                                            <label for="dtpwp-advanced-mode"><?php esc_html_e( '高级模式', 'ding-pusher' ); ?></label>
                                             <select id="dtpwp-advanced-mode" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[advanced_mode]">
-                                                <option value="smart" <?php selected( $settings['advanced_mode'], 'smart' ); ?>>智能（Smart）</option>
-                                                <option value="strict" <?php selected( $settings['advanced_mode'], 'strict' ); ?>>严格（Strict）</option>
-                                                <option value="performance" <?php selected( $settings['advanced_mode'], 'performance' ); ?>>性能优先（Performance）</option>
+                                                <option value="smart" <?php selected( $settings['advanced_mode'], 'smart' ); ?>><?php esc_html_e( '智能（Smart）', 'ding-pusher' ); ?></option>
+                                                <option value="strict" <?php selected( $settings['advanced_mode'], 'strict' ); ?>><?php esc_html_e( '严格（Strict）', 'ding-pusher' ); ?></option>
+                                                <option value="performance" <?php selected( $settings['advanced_mode'], 'performance' ); ?>><?php esc_html_e( '性能优先（Performance）', 'ding-pusher' ); ?></option>
                                             </select>
                                         </div>
                                         <div class="dtpwp-field">
-                                            <label for="dtpwp-theme-color">主题色</label>
+                                            <label for="dtpwp-theme-color"><?php esc_html_e( '主题色', 'ding-pusher' ); ?></label>
                                             <input type="text" id="dtpwp-theme-color" class="dtpwp-color-field" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[theme_color]" value="<?php echo esc_attr( $settings['theme_color'] ); ?>" data-default-color="#2563eb" />
                                         </div>
                                     </div>
 
                                     <div class="dtpwp-switch-list">
                                         <label class="dtpwp-switch-row" for="dtpwp-enable-nested-feature">
-                                            <span>启用嵌套选项</span>
+                                            <span><?php esc_html_e( '启用嵌套选项', 'ding-pusher' ); ?></span>
                                             <span class="dtpwp-switch">
                                                 <input type="checkbox" id="dtpwp-enable-nested-feature" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[enable_nested_feature]" value="1" <?php checked( $settings['enable_nested_feature'], 1 ); ?> />
                                                 <span class="dtpwp-switch-ui"></span>
@@ -297,8 +296,8 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
 
                                     <div id="dtpwp-nested-feature-fields" class="dtpwp-conditional-group dtpwp-nested-group">
                                         <div class="dtpwp-field">
-                                            <label for="dtpwp-nested-feature-note">子选项说明</label>
-                                            <input type="text" id="dtpwp-nested-feature-note" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[nested_feature_note]" value="<?php echo esc_attr( $settings['nested_feature_note'] ); ?>" placeholder="例如：仅对 VIP 频道启用严格模式" />
+                                            <label for="dtpwp-nested-feature-note"><?php esc_html_e( '子选项说明', 'ding-pusher' ); ?></label>
+                                            <input type="text" id="dtpwp-nested-feature-note" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[nested_feature_note]" value="<?php echo esc_attr( $settings['nested_feature_note'] ); ?>" placeholder="<?php echo esc_attr__( '例如：仅对 VIP 频道启用严格模式', 'ding-pusher' ); ?>" />
                                         </div>
                                     </div>
                                 </div>
@@ -308,17 +307,17 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                         <article class="dtpwp-settings-panel" data-panel-id="advanced-runtime">
                             <header class="dtpwp-panel-header">
                                 <div class="dtpwp-panel-header-main">
-                                    <span class="dtpwp-drag-handle" title="拖拽排序">⋮⋮</span>
+                                    <span class="dtpwp-drag-handle" title="<?php echo esc_attr__( '拖拽排序', 'ding-pusher' ); ?>">⋮⋮</span>
                                     <div>
-                                        <h2>运行参数</h2>
-                                        <p>调整轮询、重试与去重策略，并实时反映到预览区。</p>
+                                        <h2><?php esc_html_e( '运行参数', 'ding-pusher' ); ?></h2>
+                                        <p><?php esc_html_e( '调整轮询、重试与去重策略，并实时反映到预览区。', 'ding-pusher' ); ?></p>
                                     </div>
                                 </div>
-                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true">收起</button>
+                                <button type="button" class="dtpwp-panel-toggle" aria-expanded="true"><?php esc_html_e( '收起', 'ding-pusher' ); ?></button>
                             </header>
                             <div class="dtpwp-panel-body">
                                 <div class="dtpwp-field">
-                                    <label for="dtpwp-push-interval">推送间隔（分钟）</label>
+                                    <label for="dtpwp-push-interval"><?php esc_html_e( '推送间隔（分钟）', 'ding-pusher' ); ?></label>
                                     <div class="dtpwp-range-row">
                                         <input type="range" id="dtpwp-push-interval" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[push_interval]" min="1" max="60" value="<?php echo esc_attr( $settings['push_interval'] ); ?>" />
                                         <span class="dtpwp-range-value" id="dtpwp-push-interval-value"><?php echo esc_html( $settings['push_interval'] ); ?></span>
@@ -326,7 +325,7 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                                 </div>
 
                                 <div class="dtpwp-field">
-                                    <label for="dtpwp-retry-count">重试次数</label>
+                                    <label for="dtpwp-retry-count"><?php esc_html_e( '重试次数', 'ding-pusher' ); ?></label>
                                     <div class="dtpwp-range-row">
                                         <input type="range" id="dtpwp-retry-count" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[retry_count]" min="1" max="10" value="<?php echo esc_attr( $settings['retry_count'] ); ?>" />
                                         <span class="dtpwp-range-value" id="dtpwp-retry-count-value"><?php echo esc_html( $settings['retry_count'] ); ?></span>
@@ -335,36 +334,27 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
 
                                 <div class="dtpwp-field-grid">
                                     <div class="dtpwp-field">
-                                        <label for="dtpwp-retry-interval">重试间隔（秒）</label>
+                                        <label for="dtpwp-retry-interval"><?php esc_html_e( '重试间隔（秒）', 'ding-pusher' ); ?></label>
                                         <input type="number" id="dtpwp-retry-interval" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[retry_interval]" min="1" max="60" value="<?php echo esc_attr( $settings['retry_interval'] ); ?>" />
                                     </div>
                                     <div class="dtpwp-field">
-                                        <label for="dtpwp-deduplicate-days">去重保留天数</label>
+                                        <label for="dtpwp-deduplicate-days"><?php esc_html_e( '去重保留天数', 'ding-pusher' ); ?></label>
                                         <input type="number" id="dtpwp-deduplicate-days" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[deduplicate_days]" min="1" max="365" value="<?php echo esc_attr( $settings['deduplicate_days'] ); ?>" />
                                     </div>
                                 </div>
 
-                                <div class="dtpwp-switch-list">
-                                    <label class="dtpwp-switch-row" for="dtpwp-enable-auto-update">
-                                        <span>启用插件自动更新</span>
-                                        <span class="dtpwp-switch">
-                                            <input type="checkbox" id="dtpwp-enable-auto-update" name="<?php echo esc_attr( DTPWP_OPTION_NAME ); ?>[enable_auto_update]" value="1" <?php checked( $settings['enable_auto_update'], 1 ); ?> />
-                                            <span class="dtpwp-switch-ui"></span>
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
+                                                            </div>
                         </article>
                     </div>
                 </section>
             </div>
 
             <aside class="dtpwp-preview">
-                <h2>实时预览</h2>
-                <p>高保真消息卡片，接近真实接收端展示效果。</p>
+                <h2><?php esc_html_e( '实时预览', 'ding-pusher' ); ?></h2>
+                <p><?php esc_html_e( '高保真消息卡片，接近真实接收端展示效果。', 'ding-pusher' ); ?></p>
                 <div class="dtpwp-preview-device" id="dtpwp-preview-device">
                     <div class="dtpwp-preview-device-head">
-                        <span>钉钉</span>
+                        <span><?php esc_html_e( '钉钉', 'ding-pusher' ); ?></span>
                         <span id="dtpwp-preview-time">09:41</span>
                     </div>
 
@@ -372,56 +362,56 @@ $settings_updated = isset( $_GET['settings-updated'] ) && 'true' === $_GET['sett
                         <div class="dtpwp-preview-avatar">DP</div>
                         <div class="dtpwp-preview-bubble is-type-text is-preset-clean" id="dtpwp-preview-bubble">
                             <div class="dtpwp-preview-bubble-head">
-                                <strong>Ding Pusher 机器人</strong>
-                                <span id="dtpwp-preview-meta">文本消息 | 清爽</span>
+                                <strong><?php esc_html_e( 'Ding Pusher 机器人', 'ding-pusher' ); ?></strong>
+                                <span id="dtpwp-preview-meta"><?php esc_html_e( '文本消息 | 清爽', 'ding-pusher' ); ?></span>
                             </div>
 
-                            <h3 class="dtpwp-preview-title" id="dtpwp-preview-title">站点通知</h3>
-                            <p class="dtpwp-preview-text" id="dtpwp-preview-text">未设置消息内容</p>
+                            <h3 class="dtpwp-preview-title" id="dtpwp-preview-title"><?php esc_html_e( '站点通知', 'ding-pusher' ); ?></h3>
+                            <p class="dtpwp-preview-text" id="dtpwp-preview-text"><?php esc_html_e( '未设置消息内容', 'ding-pusher' ); ?></p>
 
                             <div class="dtpwp-preview-link" id="dtpwp-preview-link">
                                 <div class="dtpwp-preview-link-cover"></div>
                                 <div class="dtpwp-preview-link-main">
-                                    <strong id="dtpwp-preview-link-title">文章更新通知</strong>
+                                    <strong id="dtpwp-preview-link-title"><?php esc_html_e( '文章更新通知', 'ding-pusher' ); ?></strong>
                                     <span id="dtpwp-preview-link-url">https://example.com/post/123</span>
                                 </div>
                             </div>
 
                             <div class="dtpwp-preview-markdown" id="dtpwp-preview-markdown">
-                                <h4 id="dtpwp-preview-md-title"># Markdown 通知</h4>
+                                <h4 id="dtpwp-preview-md-title"><?php esc_html_e( '# Markdown 通知', 'ding-pusher' ); ?></h4>
                                 <ul id="dtpwp-preview-md-list">
-                                    <li>标题：示例内容</li>
-                                    <li>作者：Admin</li>
-                                    <li>状态：已发布</li>
+                                    <li><?php esc_html_e( '标题：示例内容', 'ding-pusher' ); ?></li>
+                                    <li><?php esc_html_e( '作者：Admin', 'ding-pusher' ); ?></li>
+                                    <li><?php esc_html_e( '状态：已发布', 'ding-pusher' ); ?></li>
                                 </ul>
                             </div>
 
                             <div class="dtpwp-preview-badges">
-                                <span class="dtpwp-preview-tag" id="dtpwp-preview-mode">文本消息</span>
-                                <span class="dtpwp-preview-tag" id="dtpwp-preview-preset-badge">预设：清爽</span>
-                                <span class="dtpwp-preview-tag" id="dtpwp-preview-advanced">高级功能：关闭</span>
-                                <span class="dtpwp-preview-tag" id="dtpwp-preview-nested">嵌套：未启用</span>
+                                <span class="dtpwp-preview-tag" id="dtpwp-preview-mode"><?php esc_html_e( '文本消息', 'ding-pusher' ); ?></span>
+                                <span class="dtpwp-preview-tag" id="dtpwp-preview-preset-badge"><?php esc_html_e( '预设：清爽', 'ding-pusher' ); ?></span>
+                                <span class="dtpwp-preview-tag" id="dtpwp-preview-advanced"><?php esc_html_e( '高级功能：关闭', 'ding-pusher' ); ?></span>
+                                <span class="dtpwp-preview-tag" id="dtpwp-preview-nested"><?php esc_html_e( '嵌套：未启用', 'ding-pusher' ); ?></span>
                             </div>
 
                             <div class="dtpwp-preview-footer">
-                                <span id="dtpwp-preview-webhook">Webhook: 未配置</span>
-                                <span id="dtpwp-preview-push">间隔：5 分钟</span>
+                                <span id="dtpwp-preview-webhook"><?php esc_html_e( 'Webhook: 未配置', 'ding-pusher' ); ?></span>
+                                <span id="dtpwp-preview-push"><?php esc_html_e( '间隔：5 分钟', 'ding-pusher' ); ?></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="dtpwp-preview-quick">
-                    <div><span>主题</span><strong id="dtpwp-preview-color">#2563eb</strong></div>
-                    <div><span>预设</span><strong id="dtpwp-preview-preset-text">清爽</strong></div>
-                    <div><span>类型</span><strong id="dtpwp-preview-type-inline">文本消息</strong></div>
+                    <div><span><?php esc_html_e( '主题', 'ding-pusher' ); ?></span><strong id="dtpwp-preview-color">#2563eb</strong></div>
+                    <div><span><?php esc_html_e( '预设', 'ding-pusher' ); ?></span><strong id="dtpwp-preview-preset-text"><?php esc_html_e( '清爽', 'ding-pusher' ); ?></strong></div>
+                    <div><span><?php esc_html_e( '类型', 'ding-pusher' ); ?></span><strong id="dtpwp-preview-type-inline"><?php esc_html_e( '文本消息', 'ding-pusher' ); ?></strong></div>
                 </div>
             </aside>
         </div>
 
         <div class="dtpwp-actions">
-            <button type="submit" class="button button-primary button-hero" id="dtpwp-save-settings">保存设置</button>
-            <button type="button" class="button button-secondary" id="dtpwp-reset-layout">重置面板布局</button>
+            <button type="submit" class="button button-primary button-hero" id="dtpwp-save-settings"><?php esc_html_e( '保存设置', 'ding-pusher' ); ?></button>
+            <button type="button" class="button button-secondary" id="dtpwp-reset-layout"><?php esc_html_e( '重置面板布局', 'ding-pusher' ); ?></button>
         </div>
     </form>
 

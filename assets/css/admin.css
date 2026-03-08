@@ -1092,3 +1092,134 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
+
+.dtpwp-help {
+    --dtpwp-help-bg: #f7f9fd;
+    --dtpwp-help-card: #ffffff;
+    --dtpwp-help-border: #d6dce8;
+    --dtpwp-help-text: #0f172a;
+    --dtpwp-help-muted: #5b6476;
+    color: var(--dtpwp-help-text);
+}
+
+.dtpwp-help .dtpwp-help-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #eef4ff, #f8fbff);
+    border: 1px solid var(--dtpwp-help-border);
+    border-radius: 16px;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.dtpwp-help .dtpwp-help-hero h1 {
+    margin: 0;
+    font-size: 26px;
+    letter-spacing: 0.01em;
+}
+
+.dtpwp-help .dtpwp-help-hero p {
+    margin: 8px 0 0;
+    color: var(--dtpwp-help-muted);
+}
+
+.dtpwp-help-hero__actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.dtpwp-help-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 18px;
+}
+
+.dtpwp-help-card {
+    background: var(--dtpwp-help-card);
+    border: 1px solid var(--dtpwp-help-border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.dtpwp-help-card h2 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.dtpwp-help-card h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dtpwp-help-muted);
+}
+
+.dtpwp-help-card p {
+    margin: 6px 0;
+    color: var(--dtpwp-help-muted);
+}
+
+.dtpwp-help-card ul,
+.dtpwp-help-card ol {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--dtpwp-help-muted);
+}
+
+.dtpwp-help-card li + li {
+    margin-top: 6px;
+}
+
+.dtpwp-help-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.dtpwp-help-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.dtpwp-help-tags code {
+    background: #eef2ff;
+    border-radius: 8px;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+.dtpwp-help-note {
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.dtpwp-help-faq details {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #f8fafc;
+}
+
+.dtpwp-help-faq details + details {
+    margin-top: 8px;
+}
+
+.dtpwp-help-faq summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--dtpwp-help-text);
+}
+
+@media (max-width: 782px) {
+    .dtpwp-help .dtpwp-help-hero {
+        flex-direction: column;
+    }
+}

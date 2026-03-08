@@ -94,4 +94,3 @@ if ( is_multisite() ) {
 	dtpwp_uninstall_cleanup_site();
 }
 
-delete_site_transient( 'dtpwp_remote_update_payload' );

@@ -2,13 +2,14 @@
 /**
  * Plugin Name: Ding Pusher
  * Plugin URI: https://github.com/Lexo0522/Ding-Pusher
- * Description: 自动将 WordPress 新文章与新用户注册消息推送到钉钉机器人。
- * Version: 1.0.1
+ * Description: Automatically push WordPress new posts and new user registration messages to DingTalk bots.
+ * Version: 1.0.2
  * Author: Kate522
  * Author URI: https://github.com/Lexo0522
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Text Domain: ding-pusher
+ * Domain Path: /languages
  * License: GPLv2 or later
  */
 
@@ -16,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DTPWP_VERSION', '1.0.1' );
+define( 'DTPWP_VERSION', '1.0.2' );
 define( 'DTPWP_OPTION_NAME', 'dtpwp_dingtalk_settings' );
 define( 'DTPWP_SENT_META_KEY', '_dtpwp_sent' );
 define( 'DTPWP_SENT_TIME_META_KEY', '_dtpwp_sent_time' );
@@ -25,7 +26,6 @@ define( 'DTPWP_SENT_MODIFIED_META_KEY', '_dtpwp_last_sent_modified_gmt' );
 define( 'DTPWP_USER_SENT_META_KEY', '_dtpwp_user_notice_sent' );
 define( 'DTPWP_ACTIVATION_TIME_OPTION', 'dtpwp_activation_time' );
 define( 'DTPWP_TITLE_HASH_OPTION', 'dtpwp_sent_title_hashes' );
-define( 'DTPWP_UPDATE_URL', 'https://raw.githubusercontent.com/Lexo0522/Ding-Pusher/master/update.json' );
 define( 'DTPWP_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'DTPWP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'DTPWP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -39,8 +39,8 @@ function dtpwp_defaults() {
 		'security_ip_whitelist' => array(),
 		'message_type' => 'text',
 		'custom_message' => '',
-		'post_template' => "【新文章】\n标题：{title}\n作者：{author}\n链接：{link}",
-		'user_template' => "【新用户注册】\n用户名：{username}\n邮箱：{email}\n注册时间：{register_time}",
+		'post_template' => __( "ãæ°æç« ã\næ é¢ï¼{title}\nä½èï¼{author}\né¾æ¥ï¼{link}", 'ding-pusher' ),
+		'user_template' => __( "ãæ°ç¨æ·æ³¨åã\nç¨æ·åï¼{username}\né®ç®±ï¼{email}\næ³¨åæ¶é´ï¼{register_time}", 'ding-pusher' ),
 		'enable_new_post' => 1,
 		'enable_post_update' => 0,
 		'enable_custom_post_type' => array(),
@@ -55,7 +55,6 @@ function dtpwp_defaults() {
 		'advanced_mode' => 'smart',
 		'enable_nested_feature' => 0,
 		'nested_feature_note' => '',
-		'enable_auto_update' => 1,
 	);
 }
 
@@ -77,7 +76,8 @@ function dtpwp_add_schedules( $schedules ) {
 		}
 		$schedules[ $key ] = array(
 			'interval' => $i * MINUTE_IN_SECONDS,
-			'display'  => sprintf( __( '每 %d 分钟执行一次', 'ding-pusher' ), $i ),
+			/* translators: %d: minutes */
+			'display'  => sprintf( __( 'æ¯ %d åéæ§è¡ä¸æ¬¡', 'ding-pusher' ), $i ),
 		);
 	}
 	return $schedules;
@@ -146,23 +146,39 @@ if ( file_exists( $dtpwp_core_file ) ) {
 	require_once $dtpwp_core_file;
 }
 
-$dtpwp_updater_file = DTPWP_PLUGIN_DIR . 'includes/class-ding-pusher-updater.php';
-if ( file_exists( $dtpwp_updater_file ) ) {
-	require_once $dtpwp_updater_file;
-}
-
 $dtpwp_admin_file = DTPWP_PLUGIN_DIR . 'admin/class-ding-pusher-admin.php';
 if ( file_exists( $dtpwp_admin_file ) ) {
 	require_once $dtpwp_admin_file;
 }
 
+function dtpwp_load_textdomain() {
+	$domain = 'ding-pusher';
+	$locale = function_exists( 'determine_locale' ) ? determine_locale() : get_locale();
+	$mofile = $domain . '-' . $locale . '.mo';
+
+	if ( function_exists( 'unload_textdomain' ) ) {
+		unload_textdomain( $domain );
+	}
+
+	$global_mofile = trailingslashit( WP_LANG_DIR ) . 'plugins/' . $mofile;
+	if ( file_exists( $global_mofile ) ) {
+		load_textdomain( $domain, $global_mofile );
+		return;
+	}
+
+	$local_mofile = DTPWP_PLUGIN_DIR . 'languages/' . $mofile;
+	if ( file_exists( $local_mofile ) ) {
+		load_textdomain( $domain, $local_mofile );
+		return;
+	}
+
+	load_plugin_textdomain( $domain, false, dirname( DTPWP_PLUGIN_BASENAME ) . '/languages' );
+}
+
 function dtpwp_bootstrap() {
-	load_plugin_textdomain( 'ding-pusher', false, dirname( DTPWP_PLUGIN_BASENAME ) . '/languages' );
+	dtpwp_load_textdomain();
 	if ( class_exists( 'Ding_Pusher_Core' ) ) {
 		Ding_Pusher_Core::get_instance();
-	}
-	if ( class_exists( 'Ding_Pusher_Updater' ) ) {
-		Ding_Pusher_Updater::get_instance();
 	}
 	if ( is_admin() && class_exists( 'Ding_Pusher_Admin' ) ) {
 		Ding_Pusher_Admin::get_instance();
@@ -170,3 +186,5 @@ function dtpwp_bootstrap() {
 	dtpwp_schedule_main_event();
 }
 add_action( 'plugins_loaded', 'dtpwp_bootstrap' );
+add_action( 'init', 'dtpwp_load_textdomain', 0 );
+add_action( 'change_locale', 'dtpwp_load_textdomain' );
