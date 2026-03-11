@@ -1,8 +1,7 @@
 # Ding Pusher 说明文档
 
 [English](readme.txt)
-
-<img src="https://img.shields.io/badge/version-v1.0.3-2563eb" alt="Version" style="zoom:100%;" />
+![Version](https://img.shields.io/badge/version-v1.0.3-2563eb)
 ![WordPress](https://img.shields.io/badge/WordPress-6.9%2B-21759b)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777bb4)
 
