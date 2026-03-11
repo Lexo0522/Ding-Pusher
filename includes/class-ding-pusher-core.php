@@ -312,7 +312,7 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 
 		private function webhook_url( $settings ) {
 			$url = ! empty( $settings['webhook_url'] ) ? esc_url_raw( $settings['webhook_url'] ) : '';
-			if ( ! $url || false === strpos( $url, 'https://oapi.dingtalk.com/robot/send' ) ) {
+			if ( ! $this->is_valid_dingtalk_webhook( $url ) ) {
 				return '';
 			}
 
@@ -331,7 +331,25 @@ if ( ! class_exists( 'Ding_Pusher_Core' ) ) {
 		}
 
 		private function has_webhook( $settings ) {
-			return ! empty( $settings['webhook_url'] ) && false !== strpos( $settings['webhook_url'], 'https://oapi.dingtalk.com/robot/send' );
+			$url = ! empty( $settings['webhook_url'] ) ? esc_url_raw( $settings['webhook_url'] ) : '';
+			return $this->is_valid_dingtalk_webhook( $url );
+		}
+
+		private function is_valid_dingtalk_webhook( $url ) {
+			if ( empty( $url ) ) {
+				return false;
+			}
+
+			$parts = wp_parse_url( $url );
+			if ( empty( $parts['scheme'] ) || empty( $parts['host'] ) || empty( $parts['path'] ) ) {
+				return false;
+			}
+
+			if ( 'https' !== strtolower( $parts['scheme'] ) || 'oapi.dingtalk.com' !== strtolower( $parts['host'] ) ) {
+				return false;
+			}
+
+			return 0 === strpos( $parts['path'], '/robot/send' );
 		}
 
 		private function primary_keyword( $settings ) {

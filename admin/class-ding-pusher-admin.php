@@ -62,6 +62,7 @@ class Ding_Pusher_Admin {
         add_action( 'wp_ajax_dtpwp_prepare_export', array( $this, 'ajax_prepare_export' ) );
         add_action( 'wp_ajax_dtpwp_clear_sent_records', array( $this, 'ajax_clear_sent_records' ) );
         add_action( 'admin_post_dtpwp_export_records', array( $this, 'handle_export_records' ) );
+        add_action( 'admin_post_dtpwp_download_export', array( $this, 'handle_download_export' ) );
     }
 
     /**
@@ -870,9 +871,24 @@ class Ding_Pusher_Admin {
             wp_send_json_error( array( 'message' => $error_message ? $error_message : __( '导出失败，请稍后重试。', 'ding-pusher' ) ) );
         }
 
+        $token = $this->create_export_download_token( $file );
+        if ( ! $token ) {
+            @unlink( $file['path'] );
+            wp_send_json_error( array( 'message' => __( '导出失败，请稍后重试。', 'ding-pusher' ) ) );
+        }
+
+        $download_url = add_query_arg(
+            array(
+                'action' => 'dtpwp_download_export',
+                'token' => rawurlencode( $token ),
+                'nonce' => wp_create_nonce( 'dtpwp_download_export' ),
+            ),
+            admin_url( 'admin-post.php' )
+        );
+
         wp_send_json_success(
             array(
-                'download_url' => $file['url'],
+                'download_url' => $download_url,
                 'filename' => $file['filename'],
             )
         );
@@ -938,6 +954,67 @@ class Ding_Pusher_Admin {
         }
 
         return $fields;
+    }
+
+    private function create_export_download_token( $file ) {
+        if ( empty( $file['path'] ) || empty( $file['filename'] ) ) {
+            return '';
+        }
+
+        $token = wp_generate_password( 32, false, false );
+        set_transient(
+            'dtpwp_export_token_' . $token,
+            array(
+                'path' => $file['path'],
+                'filename' => $file['filename'],
+                'created' => time(),
+                'user_id' => get_current_user_id(),
+            ),
+            DAY_IN_SECONDS
+        );
+
+        return $token;
+    }
+
+    public function handle_download_export() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( __( '权限不足。', 'ding-pusher' ) );
+        }
+
+        if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nonce'] ) ), 'dtpwp_download_export' ) ) {
+            wp_die( __( '非法请求。', 'ding-pusher' ) );
+        }
+
+        $token = isset( $_GET['token'] ) ? sanitize_text_field( wp_unslash( $_GET['token'] ) ) : '';
+        if ( '' === $token ) {
+            wp_die( __( '下载链接无效或已过期。', 'ding-pusher' ) );
+        }
+
+        $data = get_transient( 'dtpwp_export_token_' . $token );
+        delete_transient( 'dtpwp_export_token_' . $token );
+        if ( ! is_array( $data ) || empty( $data['path'] ) || empty( $data['filename'] ) ) {
+            wp_die( __( '下载链接无效或已过期。', 'ding-pusher' ) );
+        }
+
+        $uploads = wp_upload_dir();
+        $base_dir = wp_normalize_path( trailingslashit( $uploads['basedir'] ) . 'dtpwp-exports' );
+        $path = wp_normalize_path( $data['path'] );
+        if ( 0 !== strpos( $path, $base_dir ) || ! file_exists( $path ) || ! is_readable( $path ) ) {
+            wp_die( __( '导出文件不存在或无法读取。', 'ding-pusher' ) );
+        }
+
+        $filename = sanitize_file_name( $data['filename'] );
+        $ext = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
+        $mime = 'csv' === $ext ? 'text/csv; charset=UTF-8' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+        nocache_headers();
+        header( 'Content-Type: ' . $mime );
+        header( 'Content-Disposition: attachment; filename=' . $filename );
+        header( 'Content-Length: ' . filesize( $path ) );
+
+        readfile( $path );
+        @unlink( $path );
+        exit;
     }
 
     private function get_export_allowed_fields() {
@@ -1089,11 +1166,8 @@ class Ding_Pusher_Admin {
             return false;
         }
 
-        $url = trailingslashit( $uploads['baseurl'] ) . 'dtpwp-exports/' . $filename;
-
         return array(
             'path' => $path,
-            'url' => $url,
             'filename' => $filename,
         );
     }
