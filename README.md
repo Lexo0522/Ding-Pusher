@@ -2,7 +2,7 @@
 
 [English](readme.txt)
 
-![Version](https://img.shields.io/badge/version-v1.0.3-2563eb)
+<img src="https://img.shields.io/badge/version-v1.0.3-2563eb" alt="Version" style="zoom:100%;" />
 ![WordPress](https://img.shields.io/badge/WordPress-6.9%2B-21759b)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777bb4)
 
