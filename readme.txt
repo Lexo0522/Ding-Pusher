@@ -4,7 +4,7 @@ Tags: dingtalk, dingding, webhook, notifications, wordpress
 Requires at least: 6.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,6 +37,11 @@ Records are created only after a successful push. Trigger a push and check logs.
 Make sure ZipArchive or PclZip is enabled on the server, or export CSV instead.
 
 == Changelog ==
+= 1.0.3 =
+- Fixed the garbled default Chinese text in the main entry file
+- Strengthened the core layer Webhook verification logic
+- Transformed the export download process into a controlled download
+
 = 1.0.2 =
 - Added XLSX export compatibility with ZipArchive/PclZip and clearer availability notices.
 - Improved locale loading, English translations, and Help page content.

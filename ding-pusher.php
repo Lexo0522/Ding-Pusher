@@ -3,7 +3,7 @@
  * Plugin Name: Ding Pusher
  * Plugin URI: https://github.com/Lexo0522/Ding-Pusher
  * Description: Automatically push WordPress new posts and new user registration messages to DingTalk bots.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Kate522
  * Author URI: https://github.com/Lexo0522
  * Requires at least: 6.9
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DTPWP_VERSION', '1.0.2' );
+define( 'DTPWP_VERSION', '1.0.3' );
 define( 'DTPWP_OPTION_NAME', 'dtpwp_dingtalk_settings' );
 define( 'DTPWP_SENT_META_KEY', '_dtpwp_sent' );
 define( 'DTPWP_SENT_TIME_META_KEY', '_dtpwp_sent_time' );
@@ -39,8 +39,9 @@ function dtpwp_defaults() {
 		'security_ip_whitelist' => array(),
 		'message_type' => 'text',
 		'custom_message' => '',
-		'post_template' => __( "ãæ°æç« ã\næ é¢ï¼{title}\nä½èï¼{author}\né¾æ¥ï¼{link}", 'ding-pusher' ),
-		'user_template' => __( "ãæ°ç¨æ·æ³¨åã\nç¨æ·åï¼{username}\né®ç®±ï¼{email}\næ³¨åæ¶é´ï¼{register_time}", 'ding-pusher' ),
+		'post_template' => __( "【新文章】\n标题：{title}\n作者：{author}\n链接：{link}", 'ding-pusher' ),
+		'user_template' => __( "【新用户注册】\n用户名：{username}\n邮箱：{email}\n注册时间：{register_time}", 'ding-pusher' ),
+			'display'  => sprintf( __( '每 %d 分钟执行一次', 'ding-pusher' ), $i ),
 		'enable_new_post' => 1,
 		'enable_post_update' => 0,
 		'enable_custom_post_type' => array(),

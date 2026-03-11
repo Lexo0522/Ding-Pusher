@@ -1,14 +1,12 @@
-# Ding Pusher
+# Ding Pusher 说明文档
 
 [English](readme.txt)
 
-![Version](https://img.shields.io/badge/version-v1.0.2-2563eb)
-![WordPress](https://img.shields.io/badge/WordPress-6.9
-
-%2B-21759b)
+![Version](https://img.shields.io/badge/version-v1.0.3-2563eb)
+![WordPress](https://img.shields.io/badge/WordPress-6.9%2B-21759b)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777bb4)
 
-> 当前稳定版本：`v1.0.2`
+> 当前稳定版本：`v1.0.3`
 
 Ding Pusher 是一款 WordPress 插件，用于自动检测新文章并通过钉钉机器人推送，同时支持新用户注册提示、去重、记录管理与导出。
 
@@ -53,6 +51,15 @@ Ding Pusher 是一款 WordPress 插件，用于自动检测新文章并通过钉
 **A:** 请确认服务器已启用 ZipArchive 或 PclZip，或改用 CSV 导出。
 
 ## 更新日志
+
+
+
+### v1.0.3
+
+- 修复了主入口文件中的默认中文文案乱码
+- 加强了核心层 Webhook 校验逻辑
+- 改造导出下载链路为受控下载
+
 ### v1.0.2
 - XLSX 导出加入 ZipArchive/PclZip 兼容与可用性提示。
 - 语言加载更稳定，完善英文翻译与帮助页面。
