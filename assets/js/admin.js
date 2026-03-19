@@ -384,7 +384,7 @@ jQuery(document).ready(function($) {
         $('#dtpwp-preview-advanced').text(advancedEnabled ? t('advanced_enabled') : t('advanced_disabled'));
         $('#dtpwp-preview-nested').text(nestedText);
         $('#dtpwp-preview-webhook').text(formatWebhookLabel(webhookUrl));
-        $('#dtpwp-preview-push').text(format(t('push_interval_format', '间隔：%d 分钟'), pushInterval));
+        $('#dtpwp-preview-push').text(format(t('push_interval_format', 'Interval: %d minutes'), pushInterval));
         $('#dtpwp-preview-color').text(color);
         $('#dtpwp-preview-preset-text').text(presetText);
 
@@ -675,8 +675,8 @@ jQuery(document).ready(function($) {
             }
 
             var confirmText = bulkAction === 'delete_record'
-                ? '删除记录不会删除文章，仅移除推送记录。确认继续吗？'
-                : '确认对选中记录执行批量操作吗？';
+                ? 'Deleting records will not delete posts, only remove push records. Continue?'
+                : 'Confirm bulk operation on selected records?';
             if (!window.confirm(confirmText)) {
                 return;
             }

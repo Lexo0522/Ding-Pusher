@@ -1,17 +1,17 @@
-﻿=== Ding Pusher ===
+﻿=== Kate522 Notifier for DingTalk ===
 Contributors: kate522
 Tags: dingtalk, dingding, webhook, notifications, wordpress
 Requires at least: 6.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Automatically push WordPress new posts and new user registration messages to DingTalk bots.
 
 == Description ==
-Ding Pusher is a WordPress plugin that automatically detects new posts and pushes them to DingTalk bots. It also supports new user notifications, deduplication, records management, and exports.
+Kate522 Notifier for DingTalk is a WordPress plugin that automatically detects new posts and pushes them to DingTalk bots. It also supports new user notifications, deduplication, records management, and exports.
 
 Key features:
 - DingTalk bot setup: Webhook and security (Keyword/Signature/IP Whitelist).
@@ -37,6 +37,11 @@ Records are created only after a successful push. Trigger a push and check logs.
 Make sure ZipArchive or PclZip is enabled on the server, or export CSV instead.
 
 == Changelog ==
+= 1.0.4 =
+- Fixed garbled text in plugin entry and admin pages.
+- Corrected plugin bootstrap file paths so the plugin can load properly.
+- Repaired the settings page syntax issue that blocked admin rendering.
+
 = 1.0.3 =
 - Fixed the garbled default Chinese text in the main entry file
 - Strengthened the core layer Webhook verification logic
@@ -58,5 +63,5 @@ Make sure ZipArchive or PclZip is enabled on the server, or export CSV instead.
 - Added multiple message types.
 
 == Upgrade Notice ==
-= 1.0.2 =
-Improves XLSX export compatibility and expands help and translations.
+= 1.0.4 =
+Fixes plugin loading and garbled text issues in the admin UI.

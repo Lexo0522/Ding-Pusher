@@ -1,15 +1,13 @@
 <?php
 /**
- * Plugin Name: Ding Pusher
+ * Plugin Name: Kate522 Notifier for DingTalk
  * Plugin URI: https://github.com/Lexo0522/Ding-Pusher
  * Description: Automatically push WordPress new posts and new user registration messages to DingTalk bots.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Kate522
  * Author URI: https://github.com/Lexo0522
  * Requires at least: 6.9
  * Requires PHP: 7.4
- * Text Domain: ding-pusher
- * Domain Path: /languages
  * License: GPLv2 or later
  */
 
@@ -17,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DTPWP_VERSION', '1.0.3' );
+define( 'DTPWP_VERSION', '1.0.4' );
 define( 'DTPWP_OPTION_NAME', 'dtpwp_dingtalk_settings' );
 define( 'DTPWP_SENT_META_KEY', '_dtpwp_sent' );
 define( 'DTPWP_SENT_TIME_META_KEY', '_dtpwp_sent_time' );
@@ -39,9 +37,8 @@ function dtpwp_defaults() {
 		'security_ip_whitelist' => array(),
 		'message_type' => 'text',
 		'custom_message' => '',
-		'post_template' => __( "【新文章】\n标题：{title}\n作者：{author}\n链接：{link}", 'ding-pusher' ),
-		'user_template' => __( "【新用户注册】\n用户名：{username}\n邮箱：{email}\n注册时间：{register_time}", 'ding-pusher' ),
-			'display'  => sprintf( __( '每 %d 分钟执行一次', 'ding-pusher' ), $i ),
+		'post_template' => "[New Post]\nTitle: {title}\nAuthor: {author}\nLink: {link}",
+		'user_template' => "[New User Registration]\nUsername: {username}\nEmail: {email}\nRegistration Time: {register_time}",
 		'enable_new_post' => 1,
 		'enable_post_update' => 0,
 		'enable_custom_post_type' => array(),
@@ -78,7 +75,7 @@ function dtpwp_add_schedules( $schedules ) {
 		$schedules[ $key ] = array(
 			'interval' => $i * MINUTE_IN_SECONDS,
 			/* translators: %d: minutes */
-			'display'  => sprintf( __( 'æ¯ %d åéæ§è¡ä¸æ¬¡', 'ding-pusher' ), $i ),
+			'display'  => sprintf( 'Every %d minutes', $i ),
 		);
 	}
 	return $schedules;
@@ -152,32 +149,7 @@ if ( file_exists( $dtpwp_admin_file ) ) {
 	require_once $dtpwp_admin_file;
 }
 
-function dtpwp_load_textdomain() {
-	$domain = 'ding-pusher';
-	$locale = function_exists( 'determine_locale' ) ? determine_locale() : get_locale();
-	$mofile = $domain . '-' . $locale . '.mo';
-
-	if ( function_exists( 'unload_textdomain' ) ) {
-		unload_textdomain( $domain );
-	}
-
-	$global_mofile = trailingslashit( WP_LANG_DIR ) . 'plugins/' . $mofile;
-	if ( file_exists( $global_mofile ) ) {
-		load_textdomain( $domain, $global_mofile );
-		return;
-	}
-
-	$local_mofile = DTPWP_PLUGIN_DIR . 'languages/' . $mofile;
-	if ( file_exists( $local_mofile ) ) {
-		load_textdomain( $domain, $local_mofile );
-		return;
-	}
-
-	load_plugin_textdomain( $domain, false, dirname( DTPWP_PLUGIN_BASENAME ) . '/languages' );
-}
-
 function dtpwp_bootstrap() {
-	dtpwp_load_textdomain();
 	if ( class_exists( 'Ding_Pusher_Core' ) ) {
 		Ding_Pusher_Core::get_instance();
 	}
@@ -187,5 +159,3 @@ function dtpwp_bootstrap() {
 	dtpwp_schedule_main_event();
 }
 add_action( 'plugins_loaded', 'dtpwp_bootstrap' );
-add_action( 'init', 'dtpwp_load_textdomain', 0 );
-add_action( 'change_locale', 'dtpwp_load_textdomain' );

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Ding Pusher 管理类
+ * Kate522 Notifier for DingTalk Admin Class
  */
 class Ding_Pusher_Admin {
     const EXPORT_MAX_ROWS = 5000;
@@ -10,21 +10,21 @@ class Ding_Pusher_Admin {
     const RECORD_DELETED_META_KEY = '_dtpwp_record_deleted';
 
     /**
-     * 单例实例
+     * Singleton instance
      *
      * @var Ding_Pusher_Admin|null
      */
     private static $instance = null;
 
     /**
-     * 设置选项
+     * Settings options
      *
      * @var array
      */
     private $settings = array();
 
     /**
-     * 获取单例
+     * Get singleton instance
      *
      * @return Ding_Pusher_Admin
      */
@@ -37,7 +37,7 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * 构造函数
+     * Constructor
      */
     private function __construct() {
         $this->settings = wp_parse_args(
@@ -49,7 +49,7 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * 初始化钩子
+     * Initialize hooks
      */
     private function init_hooks() {
         add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
@@ -66,7 +66,7 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * 默认设置
+     * Default settings
      *
      * @return array
      */
@@ -79,8 +79,8 @@ class Ding_Pusher_Admin {
             'security_ip_whitelist' => array(),
             'message_type' => 'text',
             'custom_message' => '',
-            'post_template' => __( "【新文章】\n标题：{title}\n作者：{author}\n链接：{link}", 'ding-pusher' ),
-            'user_template' => __( "【新用户注册】\n用户名：{username}\n邮箱：{email}\n注册时间：{register_time}", 'ding-pusher' ),
+            'post_template' => "[New Post]\nTitle: {title}\nAuthor: {author}\nLink: {link}",
+            'user_template' => "[New User Registration]\nUsername: {username}\nEmail: {email}\nRegistration Time: {register_time}",
             'enable_new_post' => 1,
             'enable_post_update' => 0,
             'enable_custom_post_type' => array(),
@@ -99,14 +99,14 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * 添加后台菜单
+     * Add admin menu
      */
     public function add_admin_menu() {
-        $parent_slug = 'ding-pusher';
+        $parent_slug = 'kate522-notifier-for-dingtalk';
 
         add_menu_page(
-            __( 'Ding Pusher', 'ding-pusher' ),
-            __( 'Ding Pusher', 'ding-pusher' ),
+            'Kate522 Notifier for DingTalk',
+            'Kate522 Notifier for DingTalk',
             'manage_options',
             $parent_slug,
             array( $this, 'render_settings_page' ),
@@ -116,8 +116,8 @@ class Ding_Pusher_Admin {
 
         add_submenu_page(
             $parent_slug,
-            __( '设置', 'ding-pusher' ),
-            __( '设置', 'ding-pusher' ),
+            'Settings',
+            'Settings',
             'manage_options',
             $parent_slug,
             array( $this, 'render_settings_page' )
@@ -125,25 +125,25 @@ class Ding_Pusher_Admin {
 
         add_submenu_page(
             $parent_slug,
-            __( '推送记录', 'ding-pusher' ),
-            __( '推送记录', 'ding-pusher' ),
+            'Push Records',
+            'Push Records',
             'manage_options',
-            'ding-pusher-records',
+            'kate522-notifier-for-dingtalk-records',
             array( $this, 'render_records_page' )
         );
 
         add_submenu_page(
             $parent_slug,
-            __( '帮助', 'ding-pusher' ),
-            __( '帮助', 'ding-pusher' ),
+            'Help',
+            'Help',
             'manage_options',
-            'ding-pusher-help',
+            'kate522-notifier-for-dingtalk-help',
             array( $this, 'render_help_page' )
         );
     }
 
     /**
-     * 注册设置
+     * Register Settings
      */
     public function register_settings() {
         register_setting(
@@ -154,9 +154,9 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * 验证设置
+     * Validate Settings
      *
-     * @param array $input 原始输入
+     * @param array $input Raw input
      * @return array
      */
     public function validate_settings( $input ) {
@@ -165,7 +165,7 @@ class Ding_Pusher_Admin {
 
         $webhook_url = isset( $input['webhook_url'] ) ? trim( sanitize_text_field( $input['webhook_url'] ) ) : '';
         if ( ! empty( $webhook_url ) && ! preg_match( '/^https:\/\/oapi\.dingtalk\.com\/robot\/send/', $webhook_url ) ) {
-            add_settings_error( 'dtpwp_settings', 'invalid_webhook', __( 'Webhook URL 格式不正确，请检查。', 'ding-pusher' ) );
+            add_settings_error( 'dtpwp_settings', 'invalid_webhook', 'Webhook URL format is incorrect, please check.' );
         }
         $valid['webhook_url'] = $webhook_url;
 
@@ -213,7 +213,7 @@ class Ding_Pusher_Admin {
         $valid['nested_feature_note'] = isset( $input['nested_feature_note'] ) ? sanitize_text_field( $input['nested_feature_note'] ) : '';
 
 
-        // 更新定时任务
+        // Update scheduled task
         wp_clear_scheduled_hook( 'dtpwp_check_new_content' );
 
         $schedule = $valid['push_interval'] . 'm';
@@ -230,7 +230,7 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * 渲染设置页
+     * Render Settings Page
      */
     public function render_settings_page() {
         $settings = $this->settings;
@@ -238,7 +238,7 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * 渲染推送记录页
+     * Render Push Records Page
      */
     public function render_records_page() {
         $per_page = $this->get_records_per_page();
@@ -310,16 +310,16 @@ class Ding_Pusher_Admin {
         ?>
         <div class="dtpwp-records-header">
             <div>
-                <h1><?php esc_html_e( '推送记录', 'ding-pusher' ); ?></h1>
-                <p><?php esc_html_e( '查看已推送文章记录、消息内容与推送时间。', 'ding-pusher' ); ?></p>
+                <h1><?php esc_html_e('Push Records'); ?></h1>
+                <p><?php esc_html_e('View pushed post records, message content and push time.'); ?></p>
             </div>
             <div class="dtpwp-records-actions">
                 <span class="dtpwp-records-count">
-                    <?php esc_html_e( '共', 'ding-pusher' ); ?>
+                    <?php esc_html_e('Total'); ?>
                     <strong id="dtpwp-records-count"><?php echo esc_html( $total_records ); ?></strong>
-                    <?php esc_html_e( '条', 'ding-pusher' ); ?>
+                    <?php esc_html_e('records'); ?>
                 </span>
-                <button type="button" class="button dtpwp-button-danger" id="dtpwp-clear-records"><?php esc_html_e( '清理所有记录', 'ding-pusher' ); ?></button>
+                <button type="button" class="button dtpwp-button-danger" id="dtpwp-clear-records"><?php esc_html_e('Clear All Records'); ?></button>
             </div>
         </div>
         <?php
@@ -329,16 +329,16 @@ class Ding_Pusher_Admin {
         ?>
         <div class="dtpwp-records-toolbar">
             <div class="dtpwp-records-bulk">
-                <label for="dtpwp-bulk-action"><?php esc_html_e( '批量操作', 'ding-pusher' ); ?></label>
+                <label for="dtpwp-bulk-action"><?php esc_html_e('Bulk Actions'); ?></label>
                 <select id="dtpwp-bulk-action">
-                    <option value=""><?php esc_html_e( '请选择', 'ding-pusher' ); ?></option>
-                    <option value="mark_not_sent"><?php esc_html_e( '取消标记', 'ding-pusher' ); ?></option>
-                    <option value="delete_record"><?php esc_html_e( '删除记录', 'ding-pusher' ); ?></option>
+                    <option value=""><?php esc_html_e('Please Select'); ?></option>
+                    <option value="mark_not_sent"><?php esc_html_e('Unmark'); ?></option>
+                    <option value="delete_record"><?php esc_html_e('Delete Record'); ?></option>
                 </select>
-                <button type="button" class="button button-secondary" id="dtpwp-apply-bulk"><?php esc_html_e( '应用', 'ding-pusher' ); ?></button>
+                <button type="button" class="button button-secondary" id="dtpwp-apply-bulk"><?php esc_html_e('Apply'); ?></button>
             </div>
             <div class="dtpwp-records-filter">
-                <label for="dtpwp-per-page"><?php esc_html_e( '每页', 'ding-pusher' ); ?></label>
+                <label for="dtpwp-per-page"><?php esc_html_e('Per Page'); ?></label>
                 <select id="dtpwp-per-page">
                     <?php foreach ( $this->get_allowed_per_page() as $size ) : ?>
                         <option value="<?php echo esc_attr( $size ); ?>" <?php selected( $per_page, $size ); ?>><?php echo esc_html( $size ); ?></option>
@@ -346,25 +346,25 @@ class Ding_Pusher_Admin {
                 </select>
             </div>
             <div class="dtpwp-records-export">
-                <label for="dtpwp-export-format"><?php esc_html_e( '导出格式', 'ding-pusher' ); ?></label>
+                <label for="dtpwp-export-format"><?php esc_html_e('Export Format'); ?></label>
                 <select id="dtpwp-export-format">
-                    <option value="csv"><?php esc_html_e( 'CSV', 'ding-pusher' ); ?></option>
-                    <option value="xlsx"><?php esc_html_e( 'XLSX', 'ding-pusher' ); ?></option>
+                    <option value="csv"><?php esc_html_e('CSV'); ?></option>
+                    <option value="xlsx"><?php esc_html_e('XLSX'); ?></option>
                 </select>
-                <button type="button" class="button button-secondary" id="dtpwp-export-selected"><?php esc_html_e( '导出选中', 'ding-pusher' ); ?></button>
-                <button type="button" class="button button-secondary" id="dtpwp-export-all"><?php esc_html_e( '导出全部', 'ding-pusher' ); ?></button>
+                <button type="button" class="button button-secondary" id="dtpwp-export-selected"><?php esc_html_e('Export Selected'); ?></button>
+                <button type="button" class="button button-secondary" id="dtpwp-export-all"><?php esc_html_e('Export All'); ?></button>
                 <details class="dtpwp-export-fields">
-                    <summary><?php esc_html_e( '导出字段', 'ding-pusher' ); ?></summary>
+                    <summary><?php esc_html_e('Export Fields'); ?></summary>
                     <div class="dtpwp-export-fields-panel">
                         <label><input type="checkbox" value="id" checked />ID</label>
-                        <label><input type="checkbox" value="title" checked /><?php esc_html_e( '标题', 'ding-pusher' ); ?></label>
-                        <label><input type="checkbox" value="author" checked /><?php esc_html_e( '作者', 'ding-pusher' ); ?></label>
-                        <label><input type="checkbox" value="sent_time" checked /><?php esc_html_e( '推送时间', 'ding-pusher' ); ?></label>
-                        <label><input type="checkbox" value="message" checked /><?php esc_html_e( '消息内容', 'ding-pusher' ); ?></label>
-                        <label><input type="checkbox" value="link" checked /><?php esc_html_e( '链接', 'ding-pusher' ); ?></label>
+                        <label><input type="checkbox" value="title" checked /><?php esc_html_e('Title'); ?></label>
+                        <label><input type="checkbox" value="author" checked /><?php esc_html_e('Author'); ?></label>
+                        <label><input type="checkbox" value="sent_time" checked /><?php esc_html_e('Push Time'); ?></label>
+                        <label><input type="checkbox" value="message" checked /><?php esc_html_e('Message Content'); ?></label>
+                        <label><input type="checkbox" value="link" checked /><?php esc_html_e('Link'); ?></label>
                         <div class="dtpwp-export-fields-actions">
-                            <button type="button" class="button button-link dtpwp-export-select-all"><?php esc_html_e( '全选', 'ding-pusher' ); ?></button>
-                            <button type="button" class="button button-link dtpwp-export-clear"><?php esc_html_e( '清空', 'ding-pusher' ); ?></button>
+                            <button type="button" class="button button-link dtpwp-export-select-all"><?php esc_html_e('Select All'); ?></button>
+                            <button type="button" class="button button-link dtpwp-export-clear"><?php esc_html_e('Clear'); ?></button>
                         </div>
                     </div>
                 </details>
@@ -380,10 +380,10 @@ class Ding_Pusher_Admin {
                 <thead>
                     <tr>
                         <th scope="col" class="manage-column column-cb check-column"><input type="checkbox" /></th>
-                        <th scope="col" class="manage-column column-title"><?php esc_html_e( '文章标题', 'ding-pusher' ); ?></th>
-                        <th scope="col" class="manage-column column-author"><?php esc_html_e( '作者', 'ding-pusher' ); ?></th>
-                        <th scope="col" class="manage-column column-date"><?php esc_html_e( '推送时间', 'ding-pusher' ); ?></th>
-                        <th scope="col" class="manage-column column-actions"><?php esc_html_e( '操作', 'ding-pusher' ); ?></th>
+                        <th scope="col" class="manage-column column-title"><?php esc_html_e('Post Title'); ?></th>
+                        <th scope="col" class="manage-column column-author"><?php esc_html_e('Author'); ?></th>
+                        <th scope="col" class="manage-column column-date"><?php esc_html_e('Push Time'); ?></th>
+                        <th scope="col" class="manage-column column-actions"><?php esc_html_e('Actions'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -402,11 +402,11 @@ class Ding_Pusher_Admin {
                                         <a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener noreferrer"><?php the_title(); ?></a>
                                     </strong>
                                     <span class="dtpwp-record-link">
-                                        <a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '查看文章', 'ding-pusher' ); ?></a>
+                                        <a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('View Post'); ?></a>
                                     </span>
                                 </div>
                                 <div class="dtpwp-sent-message">
-                                    <strong><?php esc_html_e( '发送内容', 'ding-pusher' ); ?></strong>
+                                    <strong><?php esc_html_e('Sent Content'); ?></strong>
                                     <pre><?php echo esc_html( get_post_meta( $post_id, '_dtpwp_sent_message', true ) ); ?></pre>
                                 </div>
                             </td>
@@ -417,7 +417,7 @@ class Ding_Pusher_Admin {
                                 <span class="dtpwp-record-meta"><?php echo esc_html( get_post_meta( $post_id, '_dtpwp_sent_time', true ) ); ?></span>
                             </td>
                             <td class="column-actions">
-                                <button type="button" class="button button-link-delete dtpwp-mark-as-not-sent" data-post-id="<?php echo esc_attr( $post_id ); ?>"><?php esc_html_e( '取消标记', 'ding-pusher' ); ?></button>
+                                <button type="button" class="button button-link-delete dtpwp-mark-as-not-sent" data-post-id="<?php echo esc_attr( $post_id ); ?>"><?php esc_html_e('Unmark'); ?></button>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -445,8 +445,8 @@ class Ding_Pusher_Admin {
                 'format' => '',
                 'current' => $paged,
                 'total' => $total_pages,
-                'prev_text' => __( '上一页', 'ding-pusher' ),
-                'next_text' => __( '下一页', 'ding-pusher' ),
+                'prev_text' => 'Previous',
+                'next_text' => 'Next',
                 'type' => 'array',
             )
         );
@@ -466,62 +466,62 @@ class Ding_Pusher_Admin {
     private function render_records_empty() {
         ?>
         <div class="dtpwp-records-empty">
-            <h3><?php esc_html_e( '暂无推送记录', 'ding-pusher' ); ?></h3>
-            <p><?php esc_html_e( '当文章触发推送后，记录会显示在这里。', 'ding-pusher' ); ?></p>
+            <h3><?php esc_html_e('No Push Records'); ?></h3>
+            <p><?php esc_html_e('Records will appear here after posts are pushed.'); ?></p>
         </div>
         <?php
     }
 
     /**
-     * 渲染帮助页
+     * Render Help Page
      */
     public function render_help_page() {
         ?>
         <div class="wrap dtpwp-help">
             <div class="dtpwp-help-hero">
                 <div>
-                    <h1><?php esc_html_e( '帮助与教程', 'ding-pusher' ); ?></h1>
-                    <p><?php esc_html_e( '这里汇总常用配置步骤、模板说明与排查清单，帮助你更快完成配置。', 'ding-pusher' ); ?></p>
+                    <h1><?php esc_html_e('Help & Tutorial'); ?></h1>
+                    <p><?php esc_html_e('This page summarizes common configuration steps, template descriptions, and troubleshooting checklists to help you configure faster.'); ?></p>
                 </div>
                 <div class="dtpwp-help-hero__actions">
-                    <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=ding-pusher' ) ); ?>">
-                        <?php esc_html_e( '打开设置', 'ding-pusher' ); ?>
+                    <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=kate522-notifier-for-dingtalk' ) ); ?>">
+                        <?php esc_html_e('Open Settings'); ?>
                     </a>
-                    <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=ding-pusher-records' ) ); ?>">
-                        <?php esc_html_e( '查看记录', 'ding-pusher' ); ?>
+                    <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=kate522-notifier-for-dingtalk-records' ) ); ?>">
+                        <?php esc_html_e('View Records'); ?>
                     </a>
                 </div>
             </div>
 
             <div class="dtpwp-help-grid">
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e( '快速开始', 'ding-pusher' ); ?></h2>
+                    <h2><?php esc_html_e('Quick Start'); ?></h2>
                     <ol>
-                        <li><?php esc_html_e( '在钉钉群中创建自定义机器人。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '根据机器人安全设置选择关键词 / 加签 / IP 白名单。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '复制机器人 Webhook 地址，粘贴到设置页并保存。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '点击“发送测试消息”验证配置。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '开启触发场景与模板，观察推送记录。', 'ding-pusher' ); ?></li>
+                        <li><?php esc_html_e('Create a custom bot in the DingTalk group.'); ?></li>
+                        <li><?php esc_html_e('Select keyword / signature / IP whitelist based on bot security settings.'); ?></li>
+                        <li><?php esc_html_e('Copy the bot Webhook URL, paste it into the settings page, and save.'); ?></li>
+                        <li><?php esc_html_e('Click "Send Test Message" to verify the configuration.'); ?></li>
+                        <li><?php esc_html_e('Enable trigger scenarios and templates, observe push records.'); ?></li>
                     </ol>
                 </section>
 
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e( '配置清单', 'ding-pusher' ); ?></h2>
+                    <h2><?php esc_html_e('Configuration Checklist'); ?></h2>
                     <ul>
-                        <li><?php esc_html_e( 'Webhook：填入机器人 Webhook 地址，并确认可访问。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '安全校验：按机器人安全设置选择关键词 / 加签 / IP 白名单。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '触发场景：选择新文章、更新或新用户注册。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '消息模板：按需调整文本、链接或 Markdown 模板。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '保存并发送测试消息验证配置。', 'ding-pusher' ); ?></li>
+                        <li><?php esc_html_e('Webhook: Fill in the bot Webhook URL and confirm it is accessible.'); ?></li>
+                        <li><?php esc_html_e('Security: Select keyword / signature / IP whitelist according to bot security settings.'); ?></li>
+                        <li><?php esc_html_e('Trigger Scenarios: Select new post, update, or new user registration.'); ?></li>
+                        <li><?php esc_html_e('Message Template: Adjust text, link, or Markdown templates as needed.'); ?></li>
+                        <li><?php esc_html_e('Save and send a test message to verify the configuration.'); ?></li>
                     </ul>
                 </section>
 
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e( '模板与占位符', 'ding-pusher' ); ?></h2>
+                    <h2><?php esc_html_e('Templates & Placeholders'); ?></h2>
                     <div class="dtpwp-help-columns">
                         <div>
-                            <h3><?php esc_html_e( '文章模板', 'ding-pusher' ); ?></h3>
-                            <p><?php esc_html_e( '可用占位符：', 'ding-pusher' ); ?></p>
+                            <h3><?php esc_html_e('Post Template'); ?></h3>
+                            <p><?php esc_html_e('Available Placeholders: '); ?></p>
                             <p class="dtpwp-help-tags">
                                 <code>{title}</code>
                                 <code>{author}</code>
@@ -536,8 +536,8 @@ class Ding_Pusher_Admin {
                             </p>
                         </div>
                         <div>
-                            <h3><?php esc_html_e( '用户模板', 'ding-pusher' ); ?></h3>
-                            <p><?php esc_html_e( '可用占位符：', 'ding-pusher' ); ?></p>
+                            <h3><?php esc_html_e('User Template'); ?></h3>
+                            <p><?php esc_html_e('Available Placeholders: '); ?></p>
                             <p class="dtpwp-help-tags">
                                 <code>{username}</code>
                                 <code>{email}</code>
@@ -545,51 +545,51 @@ class Ding_Pusher_Admin {
                             </p>
                         </div>
                     </div>
-                    <p class="dtpwp-help-note"><?php esc_html_e( '提示：模板支持换行，实际消息会保留换行。', 'ding-pusher' ); ?></p>
+                    <p class="dtpwp-help-note"><?php esc_html_e('Tip: Templates support line breaks, actual messages will preserve them.'); ?></p>
                 </section>
 
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e( '触发场景', 'ding-pusher' ); ?></h2>
+                    <h2><?php esc_html_e('Trigger Scenarios'); ?></h2>
                     <ul>
-                        <li><?php esc_html_e( '新文章发布推送', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '文章更新推送', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '新用户注册提示', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '启用的自定义文章类型', 'ding-pusher' ); ?></li>
+                        <li><?php esc_html_e('New Post Publishing'); ?></li>
+                        <li><?php esc_html_e('Post Update Push'); ?></li>
+                        <li><?php esc_html_e('New User Registration'); ?></li>
+                        <li><?php esc_html_e('Enabled Custom Post Types'); ?></li>
                     </ul>
                 </section>
 
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e( '导出与记录', 'ding-pusher' ); ?></h2>
+                    <h2><?php esc_html_e('Export & Records'); ?></h2>
                     <ul>
-                        <li><?php esc_html_e( '导出会生成 CSV 或 XLSX 文件，默认保存 24 小时后自动清理。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( 'XLSX 需要服务器启用 ZipArchive 或 PclZip，若不可用可导出 CSV。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '记录页仅展示已推送的文章；如果没有记录，请先触发一次推送。', 'ding-pusher' ); ?></li>
+                        <li><?php esc_html_e('Export generates CSV or XLSX files, saved for 24 hours by default then auto-cleaned.'); ?></li>
+                        <li><?php esc_html_e('XLSX requires ZipArchive or PclZip on the server, if unavailable export CSV instead.'); ?></li>
+                        <li><?php esc_html_e('Records page shows only pushed posts; if no records, trigger a push first.'); ?></li>
                     </ul>
                 </section>
 
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e( '排查清单', 'ding-pusher' ); ?></h2>
+                    <h2><?php esc_html_e('Troubleshooting Checklist'); ?></h2>
                     <ul>
-                        <li><?php esc_html_e( '测试消息失败：检查 Webhook、安全设置与服务器网络。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '新文章未推送：确认已开启触发、文章状态为已发布，并检查 WP-Cron。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '导出失败：检查上传目录权限或改用 CSV。', 'ding-pusher' ); ?></li>
-                        <li><?php esc_html_e( '频繁触发限制：导出存在频率限制，稍后再试。', 'ding-pusher' ); ?></li>
+                        <li><?php esc_html_e('Test message failed: Check Webhook, security settings, and server network.'); ?></li>
+                        <li><?php esc_html_e('New post not pushed: Confirm trigger is enabled, post status is published, and check WP-Cron.'); ?></li>
+                        <li><?php esc_html_e('Export failed: Check upload directory permissions or use CSV instead.'); ?></li>
+                        <li><?php esc_html_e('Frequent trigger limit: Export has rate limits, try again later.'); ?></li>
                     </ul>
                 </section>
 
                 <section class="dtpwp-help-card dtpwp-help-faq">
-                    <h2><?php esc_html_e( '常见问题', 'ding-pusher' ); ?></h2>
+                    <h2><?php esc_html_e('FAQ'); ?></h2>
                     <details>
-                        <summary><?php esc_html_e( '如何配置关键词安全？', 'ding-pusher' ); ?></summary>
-                        <p><?php esc_html_e( '在钉钉机器人安全设置中添加关键词，同时在插件安全方式选择“关键词”并填入相同关键词。', 'ding-pusher' ); ?></p>
+                        <summary><?php esc_html_e('How to configure keyword security?'); ?></summary>
+                        <p><?php esc_html_e('Add keywords in DingTalk bot security settings, select "Keyword" in plugin security method and fill in the same keywords.'); ?></p>
                     </details>
                     <details>
-                        <summary><?php esc_html_e( '如何使用加签？', 'ding-pusher' ); ?></summary>
-                        <p><?php esc_html_e( '选择“加签”，填写机器人密钥，插件会自动生成签名。', 'ding-pusher' ); ?></p>
+                        <summary><?php esc_html_e('How to use signature?'); ?></summary>
+                        <p><?php esc_html_e('Select "Signature", fill in the bot secret, the plugin will automatically generate the signature.'); ?></p>
                     </details>
                     <details>
-                        <summary><?php esc_html_e( '为什么没有推送记录？', 'ding-pusher' ); ?></summary>
-                        <p><?php esc_html_e( '记录仅在成功推送后生成，请先触发一次推送并检查日志。', 'ding-pusher' ); ?></p>
+                        <summary><?php esc_html_e('Why are there no push records?'); ?></summary>
+                        <p><?php esc_html_e('Records are generated only after successful push, trigger a push first and check the logs.'); ?></p>
                     </details>
                 </section>
             </div>
@@ -598,12 +598,12 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * 加载样式和脚本
+     * Load styles and scripts
      *
-     * @param string $hook 当前后台页面钩子
+     * @param string $hook Current admin page hook
      */
     public function enqueue_assets( $hook ) {
-        if ( false === strpos( $hook, 'ding-pusher' ) ) {
+        if ( false === strpos( $hook, 'kate522-notifier-for-dingtalk' ) ) {
             return;
         }
 
@@ -630,63 +630,63 @@ class Ding_Pusher_Admin {
                 'export_max' => self::EXPORT_MAX_ROWS,
                 'xlsx_available' => $this->is_xlsx_available() ? 1 : 0,
                 'i18n' => array(
-                    'webhook_not_configured' => __( 'Webhook: 未配置', 'ding-pusher' ),
-                    'webhook_configured' => __( 'Webhook: 已配置', 'ding-pusher' ),
-                    'webhook_prefix' => __( 'Webhook: ', 'ding-pusher' ),
-                    'expand' => __( '展开', 'ding-pusher' ),
-                    'collapse' => __( '收起', 'ding-pusher' ),
-                    'site_notice' => __( '站点通知', 'ding-pusher' ),
-                    'custom_message' => __( '自定义消息', 'ding-pusher' ),
-                    'empty_message' => __( '未设置消息内容', 'ding-pusher' ),
-                    'message_notice' => __( '消息通知', 'ding-pusher' ),
-                    'markdown_notice' => __( '# Markdown 通知', 'ding-pusher' ),
-                    'example_title' => __( '标题：示例内容', 'ding-pusher' ),
-                    'example_author' => __( '作者：Admin', 'ding-pusher' ),
-                    'example_status' => __( '状态：已发布', 'ding-pusher' ),
-                    'nested_disabled' => __( '嵌套：未启用', 'ding-pusher' ),
-                    'nested_prefix' => __( '嵌套：', 'ding-pusher' ),
-                    'nested_enabled' => __( '已启用', 'ding-pusher' ),
-                    'message_type_text' => __( '文本消息', 'ding-pusher' ),
-                    'message_type_link' => __( '链接消息', 'ding-pusher' ),
-                    'message_type_markdown' => __( 'Markdown 消息', 'ding-pusher' ),
-                    'preset_clean' => __( '清爽', 'ding-pusher' ),
-                    'preset_compact' => __( '紧凑', 'ding-pusher' ),
-                    'preset_bold' => __( '强调', 'ding-pusher' ),
-                    'preset_prefix' => __( '预设：', 'ding-pusher' ),
-                    'advanced_enabled' => __( '高级功能：开启', 'ding-pusher' ),
-                    'advanced_disabled' => __( '高级功能：关闭', 'ding-pusher' ),
+                    'webhook_not_configured' => 'Webhook: Not Configured',
+                    'webhook_configured' => 'Webhook: Configured',
+                    'webhook_prefix' => 'Webhook: ',
+                    'expand' => 'Expand',
+                    'collapse' => 'Collapse',
+                    'site_notice' => 'Site Notification',
+                    'custom_message' => 'Custom Message',
+                    'empty_message' => 'No message content set',
+                    'message_notice' => 'Message Notification',
+                    'markdown_notice' => '# Markdown Notification',
+                    'example_title' => 'Title: Sample Content',
+                    'example_author' => 'Author: Admin',
+                    'example_status' => 'Status: Published',
+                    'nested_disabled' => 'Nested: Not Enabled',
+                    'nested_prefix' => 'Nested: ',
+                    'nested_enabled' => 'Enabled',
+                    'message_type_text' => 'Text Message',
+                    'message_type_link' => 'Link Message',
+                    'message_type_markdown' => 'Markdown Message',
+                    'preset_clean' => 'Clean',
+                    'preset_compact' => 'Compact',
+                    'preset_bold' => 'Bold',
+                    'preset_prefix' => 'Preset: ',
+                    'advanced_enabled' => 'Advanced Features: On',
+                    'advanced_disabled' => 'Advanced Features: Off',
                     /* translators: %d: minutes */
-                    'push_interval_format' => __( '间隔：%d 分钟', 'ding-pusher' ),
-                    'delete' => __( '删除', 'ding-pusher' ),
-                    'saving_settings' => __( '正在保存设置...', 'ding-pusher' ),
-                    'settings_saved' => __( '设置已保存', 'ding-pusher' ),
-                    'sending' => __( '发送中...', 'ding-pusher' ),
-                    'test_response_invalid' => __( '测试消息返回格式异常', 'ding-pusher' ),
-                    'test_send_failed' => __( '测试消息发送失败，请检查网络连接。', 'ding-pusher' ),
-                    'bulk_action_required' => __( '请先选择批量操作类型。', 'ding-pusher' ),
-                    'bulk_records_required' => __( '请先勾选需要操作的记录。', 'ding-pusher' ),
-                    'bulk_confirm_delete' => __( '确定要删除选中的记录吗？此操作不可恢复。', 'ding-pusher' ),
-                    'bulk_confirm_unmark' => __( '确定要取消标记所选记录吗？', 'ding-pusher' ),
-                    'processing' => __( '处理中...', 'ding-pusher' ),
-                    'record_deleted' => __( '记录已删除', 'ding-pusher' ),
-                    'record_unmarked' => __( '记录已取消标记', 'ding-pusher' ),
-                    'bulk_failed' => __( '批量操作失败', 'ding-pusher' ),
-                    'apply' => __( '应用', 'ding-pusher' ),
-                    'export_field_required' => __( '请至少选择一个导出字段。', 'ding-pusher' ),
-                    'export_too_many' => __( '记录过多，请先勾选需要导出的记录。', 'ding-pusher' ),
-                    'export_generating' => __( '生成中...', 'ding-pusher' ),
-                    'export_ready' => __( '导出已准备，开始下载。', 'ding-pusher' ),
-                    'export_failed' => __( '导出失败，请重试。', 'ding-pusher' ),
-                    'export_all' => __( '导出全部', 'ding-pusher' ),
-                    'export_selected' => __( '导出选中', 'ding-pusher' ),
-                    'export_records_required' => __( '请先勾选需要导出的记录。', 'ding-pusher' ),
-                    'xlsx_unavailable' => __( 'XLSX export requires the PHP ZipArchive extension. Switched to CSV.', 'ding-pusher' ),
-                    'mark_confirm' => __( '确定要取消标记这篇文章吗？', 'ding-pusher' ),
-                    'action_failed' => __( '操作失败', 'ding-pusher' ),
-                    'mark_cancel' => __( '取消标记', 'ding-pusher' ),
-                    'clear_confirm' => __( '确定要清理所有推送记录吗？此操作不可恢复。', 'ding-pusher' ),
-                    'clearing' => __( '清理中...', 'ding-pusher' ),
-                    'clear_failed' => __( '清理失败', 'ding-pusher' ),
+                    'push_interval_format' => 'Interval: %d minutes',
+                    'delete' => 'Delete',
+                    'saving_settings' => 'Saving settings...',
+                    'settings_saved' => 'Settings saved',
+                    'sending' => 'Sending...',
+                    'test_response_invalid' => 'Test message response format invalid',
+                    'test_send_failed' => 'Test message failed to send, please check network connection.',
+                    'bulk_action_required' => 'Please select bulk action type first.',
+                    'bulk_records_required' => 'Please select records to perform action on.',
+                    'bulk_confirm_delete' => 'Are you sure you want to delete selected records? This action cannot be undone.',
+                    'bulk_confirm_unmark' => 'Are you sure you want to unmark selected records?',
+                    'processing' => 'Processing...',
+                    'record_deleted' => 'Record deleted',
+                    'record_unmarked' => 'Record unmarked',
+                    'bulk_failed' => 'Bulk action failed',
+                    'apply' => 'Apply',
+                    'export_field_required' => 'Please select at least one export field.',
+                    'export_too_many' => 'Too many records, please select records to export.',
+                    'export_generating' => 'Generating...',
+                    'export_ready' => 'Export ready, starting download.',
+                    'export_failed' => 'Export failed, please try again.',
+                    'export_all' => 'Export All',
+                    'export_selected' => 'Export Selected',
+                    'export_records_required' => 'Please select records to export.',
+                    'xlsx_unavailable' => 'XLSX export requires the PHP ZipArchive extension. Switched to CSV.',
+                    'mark_confirm' => 'Are you sure you want to unmark this post?',
+                    'action_failed' => 'Action failed',
+                    'mark_cancel' => 'Unmark',
+                    'clear_confirm' => 'Are you sure you want to clear all push records? This action cannot be undone.',
+                    'clearing' => 'Clearing...',
+                    'clear_failed' => 'Clear failed',
                 ),
             )
         );
@@ -700,13 +700,13 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * AJAX: 发送测试消息
+     * AJAX: Send Test Message
      */
     public function ajax_test_message() {
         check_ajax_referer( 'dtpwp_nonce', 'nonce' );
 
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => __( '权限不足。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Insufficient permissions.' ) );
         }
 
         $settings = wp_parse_args( get_option( DTPWP_OPTION_NAME, array() ), $this->get_default_settings() );
@@ -719,39 +719,39 @@ class Ding_Pusher_Admin {
         $test_settings['message_type'] = isset( $raw_settings['message_type'] ) ? sanitize_text_field( $raw_settings['message_type'] ) : $settings['message_type'];
 
         if ( empty( $test_settings['webhook_url'] ) ) {
-            wp_send_json_error( array( 'message' => __( '请先填写 Webhook 地址。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Please fill in the Webhook URL first.' ) );
         }
 
         if ( ! preg_match( '/^https:\/\/oapi\.dingtalk\.com\/robot\/send/', $test_settings['webhook_url'] ) ) {
-            wp_send_json_error( array( 'message' => __( 'Webhook URL 格式不正确，请检查。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Webhook URL format is incorrect, please check.' ) );
         }
 
-        $message = __( '这是一条测试消息，来自 Ding Pusher 插件。', 'ding-pusher' );
+        $message = 'This is a test message from Kate522 Notifier for DingTalk plugin.';
         $core = Ding_Pusher_Core::get_instance();
         $success = $core->send_dingtalk_message( $message, $test_settings );
 
         if ( $success ) {
-            wp_send_json_success( array( 'message' => __( '测试消息发送成功。', 'ding-pusher' ) ) );
+            wp_send_json_success( array( 'message' => 'Test message sent successfully.' ) );
         }
 
-        wp_send_json_error( array( 'message' => __( '测试消息发送失败，请检查配置。', 'ding-pusher' ) ) );
+        wp_send_json_error( array( 'message' => 'Test message failed to send, please check the configuration.' ) );
     }
 
     /**
-     * AJAX: 取消标记或标记为已推送
+     * AJAX: Unmark or mark as sent
      */
     public function ajax_mark_as_sent() {
         check_ajax_referer( 'dtpwp_nonce', 'nonce' );
 
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => __( '权限不足。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Insufficient permissions.' ) );
         }
 
         $post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
         $mark_as = isset( $_POST['mark_as'] ) ? sanitize_text_field( wp_unslash( $_POST['mark_as'] ) ) : 'sent';
 
         if ( ! $post_id ) {
-            wp_send_json_error( array( 'message' => __( '无效的文章 ID。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Invalid post ID.' ) );
         }
 
         if ( 'not_sent' === $mark_as ) {
@@ -759,23 +759,23 @@ class Ding_Pusher_Admin {
             delete_post_meta( $post_id, '_dtpwp_sent_time' );
             delete_post_meta( $post_id, '_dtpwp_sent_message' );
             delete_post_meta( $post_id, self::RECORD_DELETED_META_KEY );
-            wp_send_json_success( array( 'message' => __( '已取消标记。', 'ding-pusher' ) ) );
+            wp_send_json_success( array( 'message' => 'Unmarked.' ) );
         }
 
         delete_post_meta( $post_id, self::RECORD_DELETED_META_KEY );
         update_post_meta( $post_id, DTPWP_SENT_META_KEY, 1 );
         update_post_meta( $post_id, '_dtpwp_sent_time', current_time( 'mysql' ) );
-        wp_send_json_success( array( 'message' => __( '标记成功。', 'ding-pusher' ) ) );
+        wp_send_json_success( array( 'message' => 'Marked successfully.' ) );
     }
 
     /**
-     * AJAX: 清理推送记录
+     * AJAX: Clear push records
      */
     public function ajax_clear_sent_records() {
         check_ajax_referer( 'dtpwp_nonce', 'nonce' );
 
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => __( '权限不足。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Insufficient permissions.' ) );
         }
 
         global $wpdb;
@@ -785,17 +785,17 @@ class Ding_Pusher_Admin {
         $wpdb->delete( $wpdb->postmeta, array( 'meta_key' => self::RECORD_DELETED_META_KEY ), array( '%s' ) );
         delete_option( 'dtpwp_sent_title_hashes' );
 
-        wp_send_json_success( array( 'message' => __( '所有记录已清理。', 'ding-pusher' ) ) );
+        wp_send_json_success( array( 'message' => 'All records have been cleared.' ) );
     }
 
     /**
-     * AJAX: 批量更新推送记录
+     * AJAX: Bulk update push records
      */
     public function ajax_bulk_update_records() {
         check_ajax_referer( 'dtpwp_nonce', 'nonce' );
 
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => __( '权限不足。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Insufficient permissions.' ) );
         }
 
         $action = isset( $_POST['bulk_action'] ) ? sanitize_text_field( wp_unslash( $_POST['bulk_action'] ) ) : '';
@@ -805,15 +805,15 @@ class Ding_Pusher_Admin {
         $post_ids = array_filter( $post_ids );
 
         if ( empty( $post_ids ) ) {
-            wp_send_json_error( array( 'message' => __( '请先选择记录。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Please select records first.' ) );
         }
 
         if ( count( $post_ids ) > self::BULK_MAX_ROWS ) {
-            wp_send_json_error( array( 'message' => __( '单次最多处理 200 条记录，请分批操作。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Maximum 200 records per batch, please process in batches.' ) );
         }
 
         if ( ! in_array( $action, array( 'mark_not_sent', 'delete_record' ), true ) ) {
-            wp_send_json_error( array( 'message' => __( '无效的批量操作。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Invalid bulk action.' ) );
         }
 
         foreach ( $post_ids as $post_id ) {
@@ -828,17 +828,17 @@ class Ding_Pusher_Admin {
             delete_post_meta( $post_id, self::RECORD_DELETED_META_KEY );
         }
 
-        wp_send_json_success( array( 'message' => __( '批量操作已完成。', 'ding-pusher' ) ) );
+        wp_send_json_success( array( 'message' => 'Bulk action completed.' ) );
     }
 
     /**
-     * AJAX: 生成导出文件
+     * AJAX: Generate export file
      */
     public function ajax_prepare_export() {
         check_ajax_referer( 'dtpwp_nonce', 'nonce' );
 
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => __( '权限不足。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Insufficient permissions.' ) );
         }
 
         $format = isset( $_POST['format'] ) ? sanitize_text_field( wp_unslash( $_POST['format'] ) ) : 'csv';
@@ -855,7 +855,7 @@ class Ding_Pusher_Admin {
         $fields = $this->sanitize_export_fields( $requested_fields );
 
         if ( ! $this->acquire_export_lock() ) {
-            wp_send_json_error( array( 'message' => __( '导出过于频繁，请稍后再试。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Export too frequent, please try again later.' ) );
         }
 
         $error_message = '';
@@ -868,13 +868,13 @@ class Ding_Pusher_Admin {
         $file = $this->prepare_export_file( $rows, $format, $error_message );
         if ( ! $file ) {
             $this->release_export_lock();
-            wp_send_json_error( array( 'message' => $error_message ? $error_message : __( '导出失败，请稍后重试。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => $error_message ? $error_message : 'Export failed, please try again later.' ) );
         }
 
         $token = $this->create_export_download_token( $file );
         if ( ! $token ) {
             @unlink( $file['path'] );
-            wp_send_json_error( array( 'message' => __( '导出失败，请稍后重试。', 'ding-pusher' ) ) );
+            wp_send_json_error( array( 'message' => 'Export failed, please try again later.' ) );
         }
 
         $download_url = add_query_arg(
@@ -895,15 +895,15 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * 导出推送记录 CSV
+     * Export push records CSV
      */
     public function handle_export_records() {
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_die( __( '权限不足。', 'ding-pusher' ) );
+            wp_die( 'Insufficient permissions.' );
         }
 
         if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nonce'] ) ), 'dtpwp_export_records' ) ) {
-            wp_die( __( '非法请求。', 'ding-pusher' ) );
+            wp_die( 'Invalid request.' );
         }
 
         $format = isset( $_GET['format'] ) ? sanitize_text_field( wp_unslash( $_GET['format'] ) ) : 'csv';
@@ -920,7 +920,7 @@ class Ding_Pusher_Admin {
         $fields = $this->sanitize_export_fields( $requested_fields );
 
         if ( ! $this->acquire_export_lock() ) {
-            wp_die( __( '导出过于频繁，请稍后再试。', 'ding-pusher' ) );
+            wp_die( 'Export too frequent, please try again later.' );
         }
 
         $error_message = '';
@@ -978,29 +978,29 @@ class Ding_Pusher_Admin {
 
     public function handle_download_export() {
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_die( __( '权限不足。', 'ding-pusher' ) );
+            wp_die( 'Insufficient permissions.' );
         }
 
         if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nonce'] ) ), 'dtpwp_download_export' ) ) {
-            wp_die( __( '非法请求。', 'ding-pusher' ) );
+            wp_die( 'Invalid request.' );
         }
 
         $token = isset( $_GET['token'] ) ? sanitize_text_field( wp_unslash( $_GET['token'] ) ) : '';
         if ( '' === $token ) {
-            wp_die( __( '下载链接无效或已过期。', 'ding-pusher' ) );
+            wp_die( 'Download link is invalid or has expired.' );
         }
 
         $data = get_transient( 'dtpwp_export_token_' . $token );
         delete_transient( 'dtpwp_export_token_' . $token );
         if ( ! is_array( $data ) || empty( $data['path'] ) || empty( $data['filename'] ) ) {
-            wp_die( __( '下载链接无效或已过期。', 'ding-pusher' ) );
+            wp_die( 'Download link is invalid or has expired.' );
         }
 
         $uploads = wp_upload_dir();
         $base_dir = wp_normalize_path( trailingslashit( $uploads['basedir'] ) . 'dtpwp-exports' );
         $path = wp_normalize_path( $data['path'] );
         if ( 0 !== strpos( $path, $base_dir ) || ! file_exists( $path ) || ! is_readable( $path ) ) {
-            wp_die( __( '导出文件不存在或无法读取。', 'ding-pusher' ) );
+            wp_die( 'Export file does not exist or cannot be read.' );
         }
 
         $filename = sanitize_file_name( $data['filename'] );
@@ -1019,12 +1019,12 @@ class Ding_Pusher_Admin {
 
     private function get_export_allowed_fields() {
         return array(
-            'id' => __( 'ID', 'ding-pusher' ),
-            'title' => __( '标题', 'ding-pusher' ),
-            'author' => __( '作者', 'ding-pusher' ),
-            'sent_time' => __( '推送时间', 'ding-pusher' ),
-            'message' => __( '消息内容', 'ding-pusher' ),
-            'link' => __( '链接', 'ding-pusher' ),
+            'id' => 'ID',
+            'title' => 'Title',
+            'author' => 'Author',
+            'sent_time' => 'Push Time',
+            'message' => 'Message Content',
+            'link' => 'Link',
         );
     }
 
@@ -1033,7 +1033,7 @@ class Ding_Pusher_Admin {
         $max_rows = self::EXPORT_MAX_ROWS;
 
         if ( ! empty( $post_ids ) && count( $post_ids ) > $max_rows ) {
-            $error_message = __( '导出数量过多，请减少选择或分批导出。', 'ding-pusher' );
+            $error_message = 'Too many records to export, please reduce selection or export in batches.';
             return array();
         }
 
@@ -1042,7 +1042,7 @@ class Ding_Pusher_Admin {
         $query = new WP_Query( $args );
 
         if ( $query->post_count > $max_rows ) {
-            $error_message = __( '导出数量过多，请缩小范围或改为导出选中记录。', 'ding-pusher' );
+            $error_message = 'Too many records to export, please narrow the scope or export selected records.';
             wp_reset_postdata();
             return array();
         }
@@ -1143,19 +1143,19 @@ class Ding_Pusher_Admin {
         $error_message = '';
         $uploads = wp_upload_dir();
         if ( ! empty( $uploads['error'] ) ) {
-            $error_message = __( '无法写入上传目录，请检查服务器权限。', 'ding-pusher' );
+            $error_message = 'Unable to write to upload directory, please check server permissions.';
             return false;
         }
 
         $dir = trailingslashit( $uploads['basedir'] ) . 'dtpwp-exports';
         if ( ! wp_mkdir_p( $dir ) ) {
-            $error_message = __( '无法创建导出目录。', 'ding-pusher' );
+            $error_message = 'Unable to create export directory.';
             return false;
         }
 
         $this->cleanup_export_files( $dir );
 
-        $filename = 'ding-pusher-records-' . gmdate( 'Ymd-His' ) . '-' . wp_generate_uuid4() . '.' . $format;
+        $filename = 'kate522-notifier-for-dingtalk-records-' . gmdate( 'Ymd-His' ) . '-' . wp_generate_uuid4() . '.' . $format;
         $path = trailingslashit( $dir ) . $filename;
 
         if ( 'xlsx' === $format ) {
@@ -1173,7 +1173,7 @@ class Ding_Pusher_Admin {
     }
 
     private function cleanup_export_files( $dir ) {
-        $files = glob( trailingslashit( $dir ) . 'ding-pusher-records-*' );
+        $files = glob( trailingslashit( $dir ) . 'kate522-notifier-for-dingtalk-records-*' );
         if ( empty( $files ) ) {
             return;
         }
@@ -1189,7 +1189,7 @@ class Ding_Pusher_Admin {
     private function output_records_csv( $rows ) {
         nocache_headers();
         header( 'Content-Type: text/csv; charset=UTF-8' );
-        header( 'Content-Disposition: attachment; filename=ding-pusher-records.csv' );
+        header( 'Content-Disposition: attachment; filename=kate522-notifier-for-dingtalk-records.csv' );
 
         echo "\xEF\xBB\xBF";
 
@@ -1204,7 +1204,7 @@ class Ding_Pusher_Admin {
         $error_message = '';
         $handle = fopen( $path, 'wb' );
         if ( ! $handle ) {
-            $error_message = __( '无法写入 CSV 文件。', 'ding-pusher' );
+            $error_message = 'Unable to write CSV file.';
             return false;
         }
 
@@ -1222,7 +1222,7 @@ class Ding_Pusher_Admin {
         if ( class_exists( 'ZipArchive' ) ) {
             $zip = new ZipArchive();
             if ( true !== $zip->open( $file_path, ZipArchive::OVERWRITE ) ) {
-                $error_message = __( 'Failed to generate XLSX file.', 'ding-pusher' );
+                $error_message = 'Failed to generate XLSX file.';
                 return false;
             }
 
@@ -1242,7 +1242,7 @@ class Ding_Pusher_Admin {
 
     private function generate_xlsx_file_with_pclzip( $rows, $file_path, &$error_message ) {
         $error_message = '';
-        $generic_error = __( 'XLSX export failed. Please enable PHP ZipArchive or PclZip.', 'ding-pusher' );
+        $generic_error = 'XLSX export failed. Please enable PHP ZipArchive or PclZip.';
 
         if ( ! class_exists( 'PclZip' ) ) {
             $pclzip_path = ABSPATH . 'wp-admin/includes/class-pclzip.php';
@@ -1293,7 +1293,7 @@ class Ding_Pusher_Admin {
         $this->delete_temp_dir( $temp_dir );
 
         if ( 0 === $result ) {
-            $error_message = __( 'Failed to generate XLSX file.', 'ding-pusher' );
+            $error_message = 'Failed to generate XLSX file.';
             return false;
         }
 
@@ -1301,24 +1301,24 @@ class Ding_Pusher_Admin {
     }
 
     /**
-     * 输出 XLSX
+     * Output XLSX
      *
-     * @param array $rows 行数据
+     * @param array $rows Row data
      */
     private function output_records_xlsx( $rows ) {
         $temp_file = wp_tempnam( 'dtpwp-records' );
         if ( ! $temp_file ) {
-            wp_die( __( '无法创建临时文件。', 'ding-pusher' ) );
+            wp_die( 'Unable to create temporary file.' );
         }
 
         $error_message = '';
         if ( ! $this->generate_xlsx_file( $rows, $temp_file, $error_message ) ) {
-            wp_die( $error_message ? $error_message : __( '无法创建 XLSX 文件。', 'ding-pusher' ) );
+            wp_die( $error_message ? $error_message : 'Unable to create XLSX file.' );
         }
 
         nocache_headers();
         header( 'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' );
-        header( 'Content-Disposition: attachment; filename=ding-pusher-records.xlsx' );
+        header( 'Content-Disposition: attachment; filename=kate522-notifier-for-dingtalk-records.xlsx' );
         header( 'Content-Length: ' . filesize( $temp_file ) );
 
         readfile( $temp_file );
