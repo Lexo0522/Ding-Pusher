@@ -8,6 +8,10 @@ class Ding_Pusher_Admin {
     const BULK_MAX_ROWS = 200;
     const EXPORT_RATE_LIMIT_SECONDS = 10;
     const RECORD_DELETED_META_KEY = '_dtpwp_record_deleted';
+    const MENU_SLUG = 'kate522-notifier-for-dingtalk';
+    const SETTINGS_SLUG = 'kate522-notifier-for-dingtalk-settings';
+    const RECORDS_SLUG = 'kate522-notifier-for-dingtalk-records';
+    const HELP_SLUG = 'kate522-notifier-for-dingtalk-help';
 
     /**
      * Singleton instance
@@ -102,11 +106,11 @@ class Ding_Pusher_Admin {
      * Add admin menu
      */
     public function add_admin_menu() {
-        $parent_slug = 'kate522-notifier-for-dingtalk';
+        $parent_slug = self::MENU_SLUG;
 
         add_menu_page(
-            'Kate522 Notifier for DingTalk',
-            'Kate522 Notifier for DingTalk',
+            'DingPusher',
+            'DingPusher',
             'manage_options',
             $parent_slug,
             array( $this, 'render_settings_page' ),
@@ -114,12 +118,14 @@ class Ding_Pusher_Admin {
             80
         );
 
+        remove_submenu_page( $parent_slug, $parent_slug );
+
         add_submenu_page(
             $parent_slug,
             'Settings',
             'Settings',
             'manage_options',
-            $parent_slug,
+            self::SETTINGS_SLUG,
             array( $this, 'render_settings_page' )
         );
 
@@ -128,7 +134,7 @@ class Ding_Pusher_Admin {
             'Push Records',
             'Push Records',
             'manage_options',
-            'kate522-notifier-for-dingtalk-records',
+            self::RECORDS_SLUG,
             array( $this, 'render_records_page' )
         );
 
@@ -137,7 +143,7 @@ class Ding_Pusher_Admin {
             'Help',
             'Help',
             'manage_options',
-            'kate522-notifier-for-dingtalk-help',
+            self::HELP_SLUG,
             array( $this, 'render_help_page' )
         );
     }
@@ -310,16 +316,16 @@ class Ding_Pusher_Admin {
         ?>
         <div class="dtpwp-records-header">
             <div>
-                <h1><?php esc_html_e('Push Records'); ?></h1>
-                <p><?php esc_html_e('View pushed post records, message content and push time.'); ?></p>
+                <h1><?php echo esc_html('Push Records'); ?></h1>
+                <p><?php echo esc_html('View pushed post records, message content and push time.'); ?></p>
             </div>
             <div class="dtpwp-records-actions">
                 <span class="dtpwp-records-count">
-                    <?php esc_html_e('Total'); ?>
+                    <?php echo esc_html('Total'); ?>
                     <strong id="dtpwp-records-count"><?php echo esc_html( $total_records ); ?></strong>
-                    <?php esc_html_e('records'); ?>
+                    <?php echo esc_html('records'); ?>
                 </span>
-                <button type="button" class="button dtpwp-button-danger" id="dtpwp-clear-records"><?php esc_html_e('Clear All Records'); ?></button>
+                <button type="button" class="button dtpwp-button-danger" id="dtpwp-clear-records"><?php echo esc_html('Clear All Records'); ?></button>
             </div>
         </div>
         <?php
@@ -329,16 +335,16 @@ class Ding_Pusher_Admin {
         ?>
         <div class="dtpwp-records-toolbar">
             <div class="dtpwp-records-bulk">
-                <label for="dtpwp-bulk-action"><?php esc_html_e('Bulk Actions'); ?></label>
+                <label for="dtpwp-bulk-action"><?php echo esc_html('Bulk Actions'); ?></label>
                 <select id="dtpwp-bulk-action">
-                    <option value=""><?php esc_html_e('Please Select'); ?></option>
-                    <option value="mark_not_sent"><?php esc_html_e('Unmark'); ?></option>
-                    <option value="delete_record"><?php esc_html_e('Delete Record'); ?></option>
+                    <option value=""><?php echo esc_html('Please Select'); ?></option>
+                    <option value="mark_not_sent"><?php echo esc_html('Unmark'); ?></option>
+                    <option value="delete_record"><?php echo esc_html('Delete Record'); ?></option>
                 </select>
-                <button type="button" class="button button-secondary" id="dtpwp-apply-bulk"><?php esc_html_e('Apply'); ?></button>
+                <button type="button" class="button button-secondary" id="dtpwp-apply-bulk"><?php echo esc_html('Apply'); ?></button>
             </div>
             <div class="dtpwp-records-filter">
-                <label for="dtpwp-per-page"><?php esc_html_e('Per Page'); ?></label>
+                <label for="dtpwp-per-page"><?php echo esc_html('Per Page'); ?></label>
                 <select id="dtpwp-per-page">
                     <?php foreach ( $this->get_allowed_per_page() as $size ) : ?>
                         <option value="<?php echo esc_attr( $size ); ?>" <?php selected( $per_page, $size ); ?>><?php echo esc_html( $size ); ?></option>
@@ -346,25 +352,25 @@ class Ding_Pusher_Admin {
                 </select>
             </div>
             <div class="dtpwp-records-export">
-                <label for="dtpwp-export-format"><?php esc_html_e('Export Format'); ?></label>
+                <label for="dtpwp-export-format"><?php echo esc_html('Export Format'); ?></label>
                 <select id="dtpwp-export-format">
-                    <option value="csv"><?php esc_html_e('CSV'); ?></option>
-                    <option value="xlsx"><?php esc_html_e('XLSX'); ?></option>
+                    <option value="csv"><?php echo esc_html('CSV'); ?></option>
+                    <option value="xlsx"><?php echo esc_html('XLSX'); ?></option>
                 </select>
-                <button type="button" class="button button-secondary" id="dtpwp-export-selected"><?php esc_html_e('Export Selected'); ?></button>
-                <button type="button" class="button button-secondary" id="dtpwp-export-all"><?php esc_html_e('Export All'); ?></button>
+                <button type="button" class="button button-secondary" id="dtpwp-export-selected"><?php echo esc_html('Export Selected'); ?></button>
+                <button type="button" class="button button-secondary" id="dtpwp-export-all"><?php echo esc_html('Export All'); ?></button>
                 <details class="dtpwp-export-fields">
-                    <summary><?php esc_html_e('Export Fields'); ?></summary>
+                    <summary><?php echo esc_html('Export Fields'); ?></summary>
                     <div class="dtpwp-export-fields-panel">
                         <label><input type="checkbox" value="id" checked />ID</label>
-                        <label><input type="checkbox" value="title" checked /><?php esc_html_e('Title'); ?></label>
-                        <label><input type="checkbox" value="author" checked /><?php esc_html_e('Author'); ?></label>
-                        <label><input type="checkbox" value="sent_time" checked /><?php esc_html_e('Push Time'); ?></label>
-                        <label><input type="checkbox" value="message" checked /><?php esc_html_e('Message Content'); ?></label>
-                        <label><input type="checkbox" value="link" checked /><?php esc_html_e('Link'); ?></label>
+                        <label><input type="checkbox" value="title" checked /><?php echo esc_html('Title'); ?></label>
+                        <label><input type="checkbox" value="author" checked /><?php echo esc_html('Author'); ?></label>
+                        <label><input type="checkbox" value="sent_time" checked /><?php echo esc_html('Push Time'); ?></label>
+                        <label><input type="checkbox" value="message" checked /><?php echo esc_html('Message Content'); ?></label>
+                        <label><input type="checkbox" value="link" checked /><?php echo esc_html('Link'); ?></label>
                         <div class="dtpwp-export-fields-actions">
-                            <button type="button" class="button button-link dtpwp-export-select-all"><?php esc_html_e('Select All'); ?></button>
-                            <button type="button" class="button button-link dtpwp-export-clear"><?php esc_html_e('Clear'); ?></button>
+                            <button type="button" class="button button-link dtpwp-export-select-all"><?php echo esc_html('Select All'); ?></button>
+                            <button type="button" class="button button-link dtpwp-export-clear"><?php echo esc_html('Clear'); ?></button>
                         </div>
                     </div>
                 </details>
@@ -380,10 +386,10 @@ class Ding_Pusher_Admin {
                 <thead>
                     <tr>
                         <th scope="col" class="manage-column column-cb check-column"><input type="checkbox" /></th>
-                        <th scope="col" class="manage-column column-title"><?php esc_html_e('Post Title'); ?></th>
-                        <th scope="col" class="manage-column column-author"><?php esc_html_e('Author'); ?></th>
-                        <th scope="col" class="manage-column column-date"><?php esc_html_e('Push Time'); ?></th>
-                        <th scope="col" class="manage-column column-actions"><?php esc_html_e('Actions'); ?></th>
+                        <th scope="col" class="manage-column column-title"><?php echo esc_html('Post Title'); ?></th>
+                        <th scope="col" class="manage-column column-author"><?php echo esc_html('Author'); ?></th>
+                        <th scope="col" class="manage-column column-date"><?php echo esc_html('Push Time'); ?></th>
+                        <th scope="col" class="manage-column column-actions"><?php echo esc_html('Actions'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -402,11 +408,11 @@ class Ding_Pusher_Admin {
                                         <a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener noreferrer"><?php the_title(); ?></a>
                                     </strong>
                                     <span class="dtpwp-record-link">
-                                        <a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('View Post'); ?></a>
+                                        <a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html('View Post'); ?></a>
                                     </span>
                                 </div>
                                 <div class="dtpwp-sent-message">
-                                    <strong><?php esc_html_e('Sent Content'); ?></strong>
+                                    <strong><?php echo esc_html('Sent Content'); ?></strong>
                                     <pre><?php echo esc_html( get_post_meta( $post_id, '_dtpwp_sent_message', true ) ); ?></pre>
                                 </div>
                             </td>
@@ -417,7 +423,7 @@ class Ding_Pusher_Admin {
                                 <span class="dtpwp-record-meta"><?php echo esc_html( get_post_meta( $post_id, '_dtpwp_sent_time', true ) ); ?></span>
                             </td>
                             <td class="column-actions">
-                                <button type="button" class="button button-link-delete dtpwp-mark-as-not-sent" data-post-id="<?php echo esc_attr( $post_id ); ?>"><?php esc_html_e('Unmark'); ?></button>
+                                <button type="button" class="button button-link-delete dtpwp-mark-as-not-sent" data-post-id="<?php echo esc_attr( $post_id ); ?>"><?php echo esc_html('Unmark'); ?></button>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -466,8 +472,8 @@ class Ding_Pusher_Admin {
     private function render_records_empty() {
         ?>
         <div class="dtpwp-records-empty">
-            <h3><?php esc_html_e('No Push Records'); ?></h3>
-            <p><?php esc_html_e('Records will appear here after posts are pushed.'); ?></p>
+            <h3><?php echo esc_html('No Push Records'); ?></h3>
+            <p><?php echo esc_html('Records will appear here after posts are pushed.'); ?></p>
         </div>
         <?php
     }
@@ -480,48 +486,48 @@ class Ding_Pusher_Admin {
         <div class="wrap dtpwp-help">
             <div class="dtpwp-help-hero">
                 <div>
-                    <h1><?php esc_html_e('Help & Tutorial'); ?></h1>
-                    <p><?php esc_html_e('This page summarizes common configuration steps, template descriptions, and troubleshooting checklists to help you configure faster.'); ?></p>
+                    <h1><?php echo esc_html('Help & Tutorial'); ?></h1>
+                    <p><?php echo esc_html('This page summarizes common configuration steps, template descriptions, and troubleshooting checklists to help you configure faster.'); ?></p>
                 </div>
                 <div class="dtpwp-help-hero__actions">
-                    <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=kate522-notifier-for-dingtalk' ) ); ?>">
-                        <?php esc_html_e('Open Settings'); ?>
+                    <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=' . self::SETTINGS_SLUG ) ); ?>">
+                        <?php echo esc_html('Open Settings'); ?>
                     </a>
-                    <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=kate522-notifier-for-dingtalk-records' ) ); ?>">
-                        <?php esc_html_e('View Records'); ?>
+                    <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=' . self::RECORDS_SLUG ) ); ?>">
+                        <?php echo esc_html('View Records'); ?>
                     </a>
                 </div>
             </div>
 
             <div class="dtpwp-help-grid">
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e('Quick Start'); ?></h2>
+                    <h2><?php echo esc_html('Quick Start'); ?></h2>
                     <ol>
-                        <li><?php esc_html_e('Create a custom bot in the DingTalk group.'); ?></li>
-                        <li><?php esc_html_e('Select keyword / signature / IP whitelist based on bot security settings.'); ?></li>
-                        <li><?php esc_html_e('Copy the bot Webhook URL, paste it into the settings page, and save.'); ?></li>
-                        <li><?php esc_html_e('Click "Send Test Message" to verify the configuration.'); ?></li>
-                        <li><?php esc_html_e('Enable trigger scenarios and templates, observe push records.'); ?></li>
+                        <li><?php echo esc_html('Create a custom bot in the DingTalk group.'); ?></li>
+                        <li><?php echo esc_html('Select keyword / signature / IP whitelist based on bot security settings.'); ?></li>
+                        <li><?php echo esc_html('Copy the bot Webhook URL, paste it into the settings page, and save.'); ?></li>
+                        <li><?php echo esc_html('Click "Send Test Message" to verify the configuration.'); ?></li>
+                        <li><?php echo esc_html('Enable trigger scenarios and templates, observe push records.'); ?></li>
                     </ol>
                 </section>
 
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e('Configuration Checklist'); ?></h2>
+                    <h2><?php echo esc_html('Configuration Checklist'); ?></h2>
                     <ul>
-                        <li><?php esc_html_e('Webhook: Fill in the bot Webhook URL and confirm it is accessible.'); ?></li>
-                        <li><?php esc_html_e('Security: Select keyword / signature / IP whitelist according to bot security settings.'); ?></li>
-                        <li><?php esc_html_e('Trigger Scenarios: Select new post, update, or new user registration.'); ?></li>
-                        <li><?php esc_html_e('Message Template: Adjust text, link, or Markdown templates as needed.'); ?></li>
-                        <li><?php esc_html_e('Save and send a test message to verify the configuration.'); ?></li>
+                        <li><?php echo esc_html('Webhook: Fill in the bot Webhook URL and confirm it is accessible.'); ?></li>
+                        <li><?php echo esc_html('Security: Select keyword / signature / IP whitelist according to bot security settings.'); ?></li>
+                        <li><?php echo esc_html('Trigger Scenarios: Select new post, update, or new user registration.'); ?></li>
+                        <li><?php echo esc_html('Message Template: Adjust text, link, or Markdown templates as needed.'); ?></li>
+                        <li><?php echo esc_html('Save and send a test message to verify the configuration.'); ?></li>
                     </ul>
                 </section>
 
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e('Templates & Placeholders'); ?></h2>
+                    <h2><?php echo esc_html('Templates & Placeholders'); ?></h2>
                     <div class="dtpwp-help-columns">
                         <div>
-                            <h3><?php esc_html_e('Post Template'); ?></h3>
-                            <p><?php esc_html_e('Available Placeholders: '); ?></p>
+                            <h3><?php echo esc_html('Post Template'); ?></h3>
+                            <p><?php echo esc_html('Available Placeholders: '); ?></p>
                             <p class="dtpwp-help-tags">
                                 <code>{title}</code>
                                 <code>{author}</code>
@@ -536,8 +542,8 @@ class Ding_Pusher_Admin {
                             </p>
                         </div>
                         <div>
-                            <h3><?php esc_html_e('User Template'); ?></h3>
-                            <p><?php esc_html_e('Available Placeholders: '); ?></p>
+                            <h3><?php echo esc_html('User Template'); ?></h3>
+                            <p><?php echo esc_html('Available Placeholders: '); ?></p>
                             <p class="dtpwp-help-tags">
                                 <code>{username}</code>
                                 <code>{email}</code>
@@ -545,51 +551,51 @@ class Ding_Pusher_Admin {
                             </p>
                         </div>
                     </div>
-                    <p class="dtpwp-help-note"><?php esc_html_e('Tip: Templates support line breaks, actual messages will preserve them.'); ?></p>
+                    <p class="dtpwp-help-note"><?php echo esc_html('Tip: Templates support line breaks, actual messages will preserve them.'); ?></p>
                 </section>
 
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e('Trigger Scenarios'); ?></h2>
+                    <h2><?php echo esc_html('Trigger Scenarios'); ?></h2>
                     <ul>
-                        <li><?php esc_html_e('New Post Publishing'); ?></li>
-                        <li><?php esc_html_e('Post Update Push'); ?></li>
-                        <li><?php esc_html_e('New User Registration'); ?></li>
-                        <li><?php esc_html_e('Enabled Custom Post Types'); ?></li>
+                        <li><?php echo esc_html('New Post Publishing'); ?></li>
+                        <li><?php echo esc_html('Post Update Push'); ?></li>
+                        <li><?php echo esc_html('New User Registration'); ?></li>
+                        <li><?php echo esc_html('Enabled Custom Post Types'); ?></li>
                     </ul>
                 </section>
 
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e('Export & Records'); ?></h2>
+                    <h2><?php echo esc_html('Export & Records'); ?></h2>
                     <ul>
-                        <li><?php esc_html_e('Export generates CSV or XLSX files, saved for 24 hours by default then auto-cleaned.'); ?></li>
-                        <li><?php esc_html_e('XLSX requires ZipArchive or PclZip on the server, if unavailable export CSV instead.'); ?></li>
-                        <li><?php esc_html_e('Records page shows only pushed posts; if no records, trigger a push first.'); ?></li>
+                        <li><?php echo esc_html('Export generates CSV or XLSX files, saved for 24 hours by default then auto-cleaned.'); ?></li>
+                        <li><?php echo esc_html('XLSX requires ZipArchive or PclZip on the server, if unavailable export CSV instead.'); ?></li>
+                        <li><?php echo esc_html('Records page shows only pushed posts; if no records, trigger a push first.'); ?></li>
                     </ul>
                 </section>
 
                 <section class="dtpwp-help-card">
-                    <h2><?php esc_html_e('Troubleshooting Checklist'); ?></h2>
+                    <h2><?php echo esc_html('Troubleshooting Checklist'); ?></h2>
                     <ul>
-                        <li><?php esc_html_e('Test message failed: Check Webhook, security settings, and server network.'); ?></li>
-                        <li><?php esc_html_e('New post not pushed: Confirm trigger is enabled, post status is published, and check WP-Cron.'); ?></li>
-                        <li><?php esc_html_e('Export failed: Check upload directory permissions or use CSV instead.'); ?></li>
-                        <li><?php esc_html_e('Frequent trigger limit: Export has rate limits, try again later.'); ?></li>
+                        <li><?php echo esc_html('Test message failed: Check Webhook, security settings, and server network.'); ?></li>
+                        <li><?php echo esc_html('New post not pushed: Confirm trigger is enabled, post status is published, and check WP-Cron.'); ?></li>
+                        <li><?php echo esc_html('Export failed: Check upload directory permissions or use CSV instead.'); ?></li>
+                        <li><?php echo esc_html('Frequent trigger limit: Export has rate limits, try again later.'); ?></li>
                     </ul>
                 </section>
 
                 <section class="dtpwp-help-card dtpwp-help-faq">
-                    <h2><?php esc_html_e('FAQ'); ?></h2>
+                    <h2><?php echo esc_html('FAQ'); ?></h2>
                     <details>
-                        <summary><?php esc_html_e('How to configure keyword security?'); ?></summary>
-                        <p><?php esc_html_e('Add keywords in DingTalk bot security settings, select "Keyword" in plugin security method and fill in the same keywords.'); ?></p>
+                        <summary><?php echo esc_html('How to configure keyword security?'); ?></summary>
+                        <p><?php echo esc_html('Add keywords in DingTalk bot security settings, select "Keyword" in plugin security method and fill in the same keywords.'); ?></p>
                     </details>
                     <details>
-                        <summary><?php esc_html_e('How to use signature?'); ?></summary>
-                        <p><?php esc_html_e('Select "Signature", fill in the bot secret, the plugin will automatically generate the signature.'); ?></p>
+                        <summary><?php echo esc_html('How to use signature?'); ?></summary>
+                        <p><?php echo esc_html('Select "Signature", fill in the bot secret, the plugin will automatically generate the signature.'); ?></p>
                     </details>
                     <details>
-                        <summary><?php esc_html_e('Why are there no push records?'); ?></summary>
-                        <p><?php esc_html_e('Records are generated only after successful push, trigger a push first and check the logs.'); ?></p>
+                        <summary><?php echo esc_html('Why are there no push records?'); ?></summary>
+                        <p><?php echo esc_html('Records are generated only after successful push, trigger a push first and check the logs.'); ?></p>
                     </details>
                 </section>
             </div>
@@ -603,7 +609,7 @@ class Ding_Pusher_Admin {
      * @param string $hook Current admin page hook
      */
     public function enqueue_assets( $hook ) {
-        if ( false === strpos( $hook, 'kate522-notifier-for-dingtalk' ) ) {
+        if ( false === strpos( $hook, self::MENU_SLUG ) ) {
             return;
         }
 
@@ -629,7 +635,7 @@ class Ding_Pusher_Admin {
                 'export_nonce' => wp_create_nonce( 'dtpwp_export_records' ),
                 'export_max' => self::EXPORT_MAX_ROWS,
                 'xlsx_available' => $this->is_xlsx_available() ? 1 : 0,
-                'i18n' => array(
+                'strings' => array(
                     'webhook_not_configured' => 'Webhook: Not Configured',
                     'webhook_configured' => 'Webhook: Configured',
                     'webhook_prefix' => 'Webhook: ',
@@ -655,7 +661,6 @@ class Ding_Pusher_Admin {
                     'preset_prefix' => 'Preset: ',
                     'advanced_enabled' => 'Advanced Features: On',
                     'advanced_disabled' => 'Advanced Features: Off',
-                    /* translators: %d: minutes */
                     'push_interval_format' => 'Interval: %d minutes',
                     'delete' => 'Delete',
                     'saving_settings' => 'Saving settings...',

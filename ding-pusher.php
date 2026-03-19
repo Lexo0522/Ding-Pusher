@@ -74,7 +74,6 @@ function dtpwp_add_schedules( $schedules ) {
 		}
 		$schedules[ $key ] = array(
 			'interval' => $i * MINUTE_IN_SECONDS,
-			/* translators: %d: minutes */
 			'display'  => sprintf( 'Every %d minutes', $i ),
 		);
 	}

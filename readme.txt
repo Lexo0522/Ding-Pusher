@@ -20,7 +20,7 @@ Key features:
 - Deduplication and record management: mark, clear, export CSV / XLSX.
 - Export cleanup: files are kept for 24 hours by default.
 - Retry on failures with logs.
-- Help page and bilingual UI.
+- Help page and clean admin UI.
 
 == Installation ==
 1. Admin upload: go to Plugins → Add New → Upload Plugin, select the ZIP and activate.
@@ -41,6 +41,9 @@ Make sure ZipArchive or PclZip is enabled on the server, or export CSV instead.
 - Fixed garbled text in plugin entry and admin pages.
 - Corrected plugin bootstrap file paths so the plugin can load properly.
 - Repaired the settings page syntax issue that blocked admin rendering.
+- Resolved the admin menu slug conflict by separating the Settings submenu slug.
+- Removed leftover translation wrapper functions from the admin UI output.
+- Aligned help-page links and admin asset loading with the current menu slugs.
 
 = 1.0.3 =
 - Fixed the garbled default Chinese text in the main entry file
@@ -64,4 +67,4 @@ Make sure ZipArchive or PclZip is enabled on the server, or export CSV instead.
 
 == Upgrade Notice ==
 = 1.0.4 =
-Fixes plugin loading and garbled text issues in the admin UI.
+Fixes plugin loading, admin menu slug conflicts, and leftover translation-wrapper usage.

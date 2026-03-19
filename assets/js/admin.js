@@ -4,12 +4,12 @@ jQuery(document).ready(function($) {
     var storageKey = 'dtpwp_admin_ui_state_v1';
     var recordsStorageKey = 'dtpwp_records_ui_state_v1';
     var ajaxConfig = window.dtpwp_ajax || {};
-    var i18n = ajaxConfig.i18n || {};
+    var strings = ajaxConfig.strings || ajaxConfig.i18n || {};
     var toastTimer = null;
 
     function t(key, fallback) {
-        if (i18n && Object.prototype.hasOwnProperty.call(i18n, key)) {
-            return i18n[key];
+        if (strings && Object.prototype.hasOwnProperty.call(strings, key)) {
+            return strings[key];
         }
         return fallback || '';
     }
